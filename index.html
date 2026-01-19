@@ -204,10 +204,120 @@
 }
 
 .field.time input{
-  font-size: 40px;  /* 4份 */
+  font-size: 30px;  /* 4份 */
   font-weight: 850;
 }
 
+/* RIGHT container */
+.side{
+  flex: 0 0 min(520px, 100%); /* 稍闊少少，唔想改可保留 420px */
+  display:flex;
+  flex-direction:column;
+  gap: 16px;
+  height: min(520px, 70vh);
+  position: relative;
+}
+
+/* groups list takes all space */
+.groups{
+  flex: 1;
+  display:flex;
+  flex-direction:column;
+  gap: 18px;
+  min-height: 0; /* important for flex children shrink */
+  padding-right: 70px; /* 留位畀右下角加號唔會遮住內容 */
+}
+
+/* each group: two fields stacked */
+.group{
+  flex: 1;                 /* 令每組平均分配高度 -> 新增越多，每組越矮 */
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
+  min-height: 0;
+}
+
+/* field box (你原本已有可以保留，但要加 min-height:0) */
+.field{
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 18px rgba(0,0,0,.05);
+  padding: 14px 16px;
+  display:flex;
+  overflow:hidden;
+  min-height: 0;
+}
+
+/* height ratio 5:4 inside each group */
+.field.main { flex: 5; }
+.field.time { flex: 4; }
+
+/* multi-line main */
+.field.main textarea{
+  width:100%;
+  height:100%;
+  border:0;
+  outline:none;
+  background:transparent;
+  color: var(--text);
+  font-size: 48px;   /* main = 5份 */
+  font-weight: 800;
+  letter-spacing: .2px;
+  line-height: 1.08;
+  resize: none;      /* 避免右下角拉伸手柄破壞版面 */
+  padding: 2px 2px;
+}
+
+/* time (single line) */
+.field.time input{
+  width:100%;
+  height:100%;
+  border:0;
+  outline:none;
+  background:transparent;
+  color: var(--text);
+  font-size: 38px;   /* time = 4份 */
+  font-weight: 800;
+  letter-spacing: .2px;
+  padding: 2px 2px;
+}
+
+/* placeholder */
+.field textarea::placeholder,
+.field input::placeholder{
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* plus button (bottom-right) */
+.addBtn{
+  position:absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 900;
+  cursor: pointer;
+  user-select:none;
+}
+.addBtn:active{
+  transform: translateY(1px);
+}
+
+/* small screens: keep okay */
+@media (max-width: 900px){
+  .groups{ padding-right: 0; }
+  .addBtn{ right: 12px; bottom: 12px; }
+  .field.main textarea{ font-size: 40px; }
+  .field.time input{ font-size: 32px; }
+}
 
 
     input{
@@ -255,15 +365,24 @@
         </div>
       </div>
 
-      <div class="side">
-  <div class="field main">
-    <input id="main" type="text" placeholder="Level / Subj / Paper">
+ <div class="side" id="side">
+  <div class="groups" id="groups">
+    <!-- 第一組（預設存在） -->
+    <div class="group">
+      <div class="field main">
+        <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+      </div>
+
+      <div class="field time">
+        <input class="timeInput" type="text" placeholder="Time">
+      </div>
+    </div>
   </div>
 
-  <div class="field time">
-    <input id="time" type="text" placeholder="Time">
-  </div>
+  <!-- 右下角加號 -->
+  <button class="addBtn" id="addBtn" type="button" aria-label="Add another pair">＋</button>
 </div>
+
 
     </div>
   </div>
@@ -381,6 +500,34 @@ for (let n = 1; n <= 12; n++){
       setInterval(tick, 1000);
       setInterval(syncOnce, 5 * 60 * 1000);
     })();
+
+    // ====== Add-group button ======
+const groupsEl = document.getElementById("groups");
+const addBtn = document.getElementById("addBtn");
+
+function createGroup(){
+  const group = document.createElement("div");
+  group.className = "group";
+  group.innerHTML = `
+    <div class="field main">
+      <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+    </div>
+    <div class="field time">
+      <input class="timeInput" type="text" placeholder="Time">
+    </div>
+  `;
+  return group;
+}
+
+addBtn.addEventListener("click", () => {
+  const g = createGroup();
+  groupsEl.appendChild(g);
+
+  // focus new main textarea for quick typing
+  const ta = g.querySelector("textarea");
+  if (ta) ta.focus();
+});
+
   </script>
 </body>
 </html>
