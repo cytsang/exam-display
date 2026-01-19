@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HK Analog Clock</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#f6f7f9;
+      --border:#d9dde3;
+      --text:#111827;
+      --muted:#9aa3af;
+      --shadow: 0 10px 25px rgba(0,0,0,.08);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "PingFang HK", "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap{
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+    }
+    .stage{
+      width: min(1100px, 100%);
+      display:flex;
+      gap: 28px;
+      align-items:center;
+    }
+
+    /* LEFT */
+    .clockShell{
+      flex: 1 1 60%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .clockCircle{
+      width: min(560px, 68vw);
+      aspect-ratio: 1 / 1;
+      border: 2px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 22px;
+      position: relative;
+    }
+
+    .face{
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      position: relative;
+      background:
+        radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
+        radial-gradient(circle at center, rgba(0,0,0,.03) 0 55%, transparent 56%),
+        #fff;
+    }
+
+    .mark{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width: 6px;
+      height: 18px;
+      background: rgba(17,24,39,.65);
+      border-radius: 4px;
+      transform: translate(-50%, -50%) rotate(0deg) translateY(-46%);
+    }
+    .mark.minor{
+      width: 3px;
+      height: 10px;
+      background: rgba(17,24,39,.25);
+    }
+
+    .hand{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform-origin: 50% 100%;
+      border-radius: 999px;
+      transform: translate(-50%, -100%) rotate(0deg);
+    }
+    .hand.hour{
+      width: 10px;
+      height: 32%;
+      background: rgba(17,24,39,.85);
+    }
+    .hand.minute{
+      width: 7px;
+      height: 42%;
+      background: rgba(17,24,39,.8);
+    }
+    .hand.second{
+      width: 3px;
+      height: 48%;
+      background: rgba(220,38,38,.95);
+    }
+    .hub{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      transform: translate(-50%,-50%);
+      background: rgba(17,24,39,.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+
+    .readout{
+      position:absolute;
+      left:50%;
+      bottom: 8%;
+      transform: translateX(-50%);
+      text-align:center;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(246,247,249,.85);
+      backdrop-filter: blur(6px);
+      min-width: 240px;
+    }
+    .digital{
+      font-variant-numeric: tabular-nums;
+      font-weight: 850;
+      font-size: 24px;
+      letter-spacing: .5px;
+    }
+    .status{
+      margin-top: 4px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* RIGHT */
+    .side{
+      flex: 0 0 min(420px, 100%);
+      display:flex;
+      flex-direction:column;
+      gap: 16px;
+      height: min(520px, 70vh);
+    }
+    .field{
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 18px rgba(0,0,0,.05);
+      padding: 14px 16px;
+      display:flex;
+      overflow:hidden;
+    }
+    .field.level   { flex: 2; }
+    .field.subject { flex: 4; }
+    .field.time    { flex: 1; }
+
+    input{
+      width:100%;
+      height:100%;
+      border:0;
+      outline:none;
+      background:transparent;
+      color: var(--text);
+      font-size: 40px;     /* 只放大字體 */
+      font-weight: 800;
+      letter-spacing: .2px;
+      padding: 2px 2px;
+    }
+    input::placeholder{
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px){
+      .stage{ flex-direction:column; }
+      .side{ width: min(560px, 100%); height: min(520px, 55vh); }
+      .clockShell{ width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="stage">
+      <div class="clockShell">
+        <div class="clockCircle">
+          <div class="face" id="face">
+            <div class="hand hour" id="hHand"></div>
+            <div class="hand minute" id="mHand"></div>
+            <div class="hand second" id="sHand"></div>
+            <div class="hub"></div>
+
+            <div class="readout">
+              <div class="digital" id="digital">--:--:--</div>
+              <div class="status" id="syncStatus">Syncing…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="field level"><input type="text" placeholder="Level"></div>
+        <div class="field subject"><input type="text" placeholder="Subject / Paper"></div>
+        <div class="field time"><input type="text" placeholder="Time"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== Clock marks ======
+    const face = document.getElementById("face");
+    for (let i = 0; i < 60; i++){
+      const isHour = (i % 5 === 0);
+      const d = document.createElement("div");
+      d.className = "mark" + (isHour ? "" : " minor");
+      d.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg) translateY(-46%)`;
+      face.appendChild(d);
+    }
+
+    // ====== Online sync via Apps Script ======
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydFg6fSuA9KQn5ZY42PRn2t09tq2Kqbrsv3TlqDPIVyNpNEadheHSmr3t2bZGxONEh/exec"; // <-- replace
+    const TZ = "Asia/Hong_Kong";
+
+    const hHand = document.getElementById("hHand");
+    const mHand = document.getElementById("mHand");
+    const sHand = document.getElementById("sHand");
+    const digital = document.getElementById("digital");
+    const syncStatus = document.getElementById("syncStatus");
+
+    let offsetMs = 0;
+    let onlineSynced = false;
+
+    const digitalFmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: TZ,
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false
+    });
+
+    function hkParts(date){
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: TZ,
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: false
+      }).formatToParts(date);
+
+      return {
+        hh: Number(parts.find(p => p.type === "hour").value),
+        mm: Number(parts.find(p => p.type === "minute").value),
+        ss: Number(parts.find(p => p.type === "second").value),
+      };
+    }
+
+    function render(epochMs){
+      const d = new Date(epochMs);
+
+      digital.textContent = digitalFmt.format(d);
+
+      const {hh, mm, ss} = hkParts(d);
+      const hour12 = hh % 12;
+      const ms = d.getMilliseconds();
+      const secFloat = ss + ms / 1000;
+
+      const secDeg = secFloat * 6;
+      const minDeg = (mm + secFloat/60) * 6;
+      const hourDeg = (hour12 + mm/60 + secFloat/3600) * 30;
+
+      sHand.style.transform = `translate(-50%, -100%) rotate(${secDeg}deg)`;
+      mHand.style.transform = `translate(-50%, -100%) rotate(${minDeg}deg)`;
+      hHand.style.transform = `translate(-50%, -100%) rotate(${hourDeg}deg)`;
+    }
+
+    function tick(){
+      render(Date.now() + offsetMs);
+    }
+
+    async function syncOnce(){
+      try{
+        syncStatus.textContent = "Syncing (online)…";
+        const t0 = performance.now();
+        const res = await fetch(SCRIPT_URL, { cache: "no-store" });
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if(typeof data.epochMs !== "number") throw new Error("Missing epochMs");
+
+        const serverEpoch = data.epochMs;
+        const t1 = performance.now();
+        const rtt = (t1 - t0);
+        const approxLocalAtMid = Date.now() - (rtt / 2);
+
+        offsetMs = serverEpoch - approxLocalAtMid;
+        onlineSynced = true;
+        syncStatus.textContent = "Online synced ✓";
+      }catch(e){
+        syncStatus.textContent = onlineSynced ? "Sync failed (keeping last sync)" : "Offline fallback (device clock)";
+      }
+    }
+
+    (async () => {
+      await syncOnce();
+      tick();
+      setInterval(tick, 1000);
+      setInterval(syncOnce, 5 * 60 * 1000);
+    })();
+  </script>
+</body>
+</html>
