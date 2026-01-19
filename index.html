@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>HK Analog Clock</title>
+
   <style>
     :root{
       --bg:#ffffff;
@@ -11,9 +12,9 @@
       --border:#d9dde3;
       --text:#111827;
       --muted:#9aa3af;
-      --shadow: 0 10px 25px rgba(0,0,0,.08);
       --radius:18px;
     }
+
     *{ box-sizing:border-box; }
     body{
       margin:0;
@@ -21,6 +22,7 @@
       background: var(--bg);
       color: var(--text);
     }
+
     .wrap{
       min-height: 100vh;
       display:flex;
@@ -28,6 +30,7 @@
       justify-content:center;
       padding: 24px;
     }
+
     .stage{
       width: min(1100px, 100%);
       display:flex;
@@ -42,32 +45,31 @@
       align-items:center;
       justify-content:center;
     }
-.clockCircle{
-  width: min(560px, 68vw);
-  aspect-ratio: 1 / 1;
-  border: 10px solid #2563eb;   /* 藍色粗圓框（Tailwind blue-600） */
-  border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 12px 30px rgba(37,99,235,.25); /* 藍色陰影 */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding: 16px;               /* 因為邊框加粗，縮少 padding */
-  position: relative;
-}
 
+    .clockCircle{
+      width: min(560px, 68vw);
+      aspect-ratio: 1 / 1;
+      border: 10px solid #2563eb;         /* blue border */
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(37,99,235,.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      position: relative;
+    }
 
-.face{
-  width: 100%;
-  height: 100%;
-  border-radius: 999px;
-  position: relative;
-  background:
-    radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
-    radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
-    #fff7cc;   /* 淺黃色鐘面 */
-}
-
+    .face{
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      position: relative;
+      background:
+        radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
+        radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
+        #fff7cc; /* pale yellow */
+    }
 
     /* marks */
     .mark{
@@ -79,6 +81,7 @@
       background: rgba(17,24,39,.70);
       border-radius: 6px;
       transform: translate(-50%, -50%) rotate(0deg) translateY(-46%);
+      z-index: 1;
     }
     .mark.minor{
       width: 3px;
@@ -89,18 +92,17 @@
 
     /* numbers 1-12 */
     .num{
-  position:absolute;
-  transform: translate(-50%, -50%);
-  font-variant-numeric: tabular-nums;
-  font-weight: 850;
-  font-size: clamp(18px, 2.2vw, 26px);
-  color: rgba(17,24,39,.75);
-  user-select: none;
-  pointer-events: none;
-  text-shadow: 0 1px 0 rgba(255,255,255,.6);
-  z-index: 2; /* 確保喺刻度之上 */
-}
-
+      position:absolute;
+      transform: translate(-50%, -50%);
+      font-variant-numeric: tabular-nums;
+      font-weight: 850;
+      font-size: clamp(18px, 2.2vw, 26px);
+      color: rgba(17,24,39,.78);
+      user-select: none;
+      pointer-events: none;
+      text-shadow: 0 1px 0 rgba(255,255,255,.6);
+      z-index: 2;
+    }
 
     /* hands */
     .hand{
@@ -111,9 +113,8 @@
       border-radius: 999px;
       transform: translate(-50%, -100%) rotate(0deg);
       box-shadow: 0 6px 14px rgba(0,0,0,.08);
+      z-index: 4;
     }
-
-    /* thicker hour/minute hands */
     .hand.hour{
       width: 14px;
       height: 30%;
@@ -124,13 +125,12 @@
       height: 42%;
       background: rgba(17,24,39,.82);
     }
-
-    /* keep second hand */
     .hand.second{
       width: 3px;
       height: 48%;
       background: rgba(220,38,38,.95);
       box-shadow: none;
+      z-index: 6;
     }
 
     .hub{
@@ -143,7 +143,7 @@
       transform: translate(-50%,-50%);
       background: rgba(17,24,39,.96);
       box-shadow: 0 2px 10px rgba(0,0,0,.18);
-      z-index: 5;
+      z-index: 7;
     }
     .hub::after{
       content:"";
@@ -165,6 +165,7 @@
       background: rgba(246,247,249,.88);
       backdrop-filter: blur(6px);
       min-width: 240px;
+      z-index: 8;
     }
     .digital{
       font-variant-numeric: tabular-nums;
@@ -178,14 +179,38 @@
       color: #6b7280;
     }
 
-    /* RIGHT */
+    /* RIGHT (dynamic groups) */
     .side{
-      flex: 0 0 min(420px, 100%);
+      flex: 0 0 min(520px, 100%);
       display:flex;
       flex-direction:column;
       gap: 16px;
       height: min(520px, 70vh);
+      position: relative;
+
+      /* dynamic font sizes controlled by JS */
+      --mainFont: 50px;
+      --timeFont: 30px;
     }
+
+    .groups{
+      flex: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+      min-height: 0;
+      padding-right: 70px; /* space for + button */
+    }
+
+    .group{
+      flex: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+      min-height: 0;
+      position: relative; /* for delete button */
+    }
+
     .field{
       background: var(--panel);
       border: 2px solid var(--border);
@@ -194,153 +219,102 @@
       padding: 14px 16px;
       display:flex;
       overflow:hidden;
+      min-height: 0;
     }
+
+    /* height ratio 5:4 inside each group */
     .field.main { flex: 5; }
     .field.time { flex: 4; }
 
-    .field.main input{
-  font-size: 50px;  /* 5份 */
-  font-weight: 850;
-}
-
-.field.time input{
-  font-size: 30px;  /* 4份 */
-  font-weight: 850;
-}
-
-/* RIGHT container */
-.side{
-  flex: 0 0 min(520px, 100%); /* 稍闊少少，唔想改可保留 420px */
-  display:flex;
-  flex-direction:column;
-  gap: 16px;
-  height: min(520px, 70vh);
-  position: relative;
-}
-
-/* groups list takes all space */
-.groups{
-  flex: 1;
-  display:flex;
-  flex-direction:column;
-  gap: 18px;
-  min-height: 0; /* important for flex children shrink */
-  padding-right: 70px; /* 留位畀右下角加號唔會遮住內容 */
-}
-
-/* each group: two fields stacked */
-.group{
-  flex: 1;                 /* 令每組平均分配高度 -> 新增越多，每組越矮 */
-  display:flex;
-  flex-direction:column;
-  gap: 14px;
-  min-height: 0;
-}
-
-/* field box (你原本已有可以保留，但要加 min-height:0) */
-.field{
-  background: var(--panel);
-  border: 2px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 18px rgba(0,0,0,.05);
-  padding: 14px 16px;
-  display:flex;
-  overflow:hidden;
-  min-height: 0;
-}
-
-/* height ratio 5:4 inside each group */
-.field.main { flex: 5; }
-.field.time { flex: 4; }
-
-/* multi-line main */
-.field.main textarea{
-  width:100%;
-  height:100%;
-  border:0;
-  outline:none;
-  background:transparent;
-  color: var(--text);
-  font-size: 48px;   /* main = 5份 */
-  font-weight: 800;
-  letter-spacing: .2px;
-  line-height: 1.08;
-  resize: none;      /* 避免右下角拉伸手柄破壞版面 */
-  padding: 2px 2px;
-}
-
-/* time (single line) */
-.field.time input{
-  width:100%;
-  height:100%;
-  border:0;
-  outline:none;
-  background:transparent;
-  color: var(--text);
-  font-size: 38px;   /* time = 4份 */
-  font-weight: 800;
-  letter-spacing: .2px;
-  padding: 2px 2px;
-}
-
-/* placeholder */
-.field textarea::placeholder,
-.field input::placeholder{
-  color: var(--muted);
-  font-weight: 700;
-}
-
-/* plus button (bottom-right) */
-.addBtn{
-  position:absolute;
-  right: 8px;
-  bottom: 8px;
-  width: 54px;
-  height: 54px;
-  border-radius: 999px;
-  border: 2px solid var(--border);
-  background: #ffffff;
-  box-shadow: 0 10px 22px rgba(0,0,0,.10);
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 900;
-  cursor: pointer;
-  user-select:none;
-}
-.addBtn:active{
-  transform: translateY(1px);
-}
-
-/* small screens: keep okay */
-@media (max-width: 900px){
-  .groups{ padding-right: 0; }
-  .addBtn{ right: 12px; bottom: 12px; }
-  .field.main textarea{ font-size: 40px; }
-  .field.time input{ font-size: 32px; }
-}
-
-
-    input{
+    /* multi-line main */
+    .field.main textarea{
       width:100%;
       height:100%;
       border:0;
       outline:none;
       background:transparent;
       color: var(--text);
-      font-size: 40px;
-      font-weight: 800;
+      font-size: var(--mainFont);
+      font-weight: 850;
+      letter-spacing: .2px;
+      line-height: 1.08;
+      resize: none;
+      padding: 2px 2px;
+      overflow: hidden; /* keep clean */
+    }
+
+    /* time (single line) */
+    .field.time input{
+      width:100%;
+      height:100%;
+      border:0;
+      outline:none;
+      background:transparent;
+      color: var(--text);
+      font-size: var(--timeFont);
+      font-weight: 850;
       letter-spacing: .2px;
       padding: 2px 2px;
     }
-    input::placeholder{
+
+    .field textarea::placeholder,
+    .field input::placeholder{
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 750;
     }
+
+    /* plus button */
+    .addBtn{
+      position:absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+      cursor: pointer;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .addBtn:active{ transform: translateY(1px); }
+    .addBtn[disabled]{ opacity:.45; cursor:not-allowed; }
+
+    /* delete button per group */
+    .delBtn{
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 8px 16px rgba(0,0,0,.10);
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 10;
+    }
+    .delBtn:active{ transform: translateY(1px); }
 
     @media (max-width: 900px){
       .stage{ flex-direction:column; }
       .side{ width: min(560px, 100%); height: min(520px, 55vh); }
       .clockShell{ width: 100%; }
+      .groups{ padding-right: 0; }
+      .addBtn{ right: 12px; bottom: 12px; }
     }
   </style>
 </head>
@@ -348,10 +322,11 @@
 <body>
   <div class="wrap">
     <div class="stage">
+
+      <!-- LEFT clock -->
       <div class="clockShell">
         <div class="clockCircle">
           <div class="face" id="face">
-            <!-- JS will insert marks + numbers -->
             <div class="hand hour" id="hHand"></div>
             <div class="hand minute" id="mHand"></div>
             <div class="hand second" id="sHand"></div>
@@ -365,24 +340,25 @@
         </div>
       </div>
 
- <div class="side" id="side">
-  <div class="groups" id="groups">
-    <!-- 第一組（預設存在） -->
-    <div class="group">
-      <div class="field main">
-        <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+      <!-- RIGHT dynamic textbox groups -->
+      <div class="side" id="side">
+        <div class="groups" id="groups">
+          <!-- Group 1 -->
+          <div class="group">
+            <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
+
+            <div class="field main">
+              <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+            </div>
+
+            <div class="field time">
+              <input class="timeInput" type="text" placeholder="Time">
+            </div>
+          </div>
+        </div>
+
+        <button class="addBtn" id="addBtn" type="button" aria-label="Add another pair">＋</button>
       </div>
-
-      <div class="field time">
-        <input class="timeInput" type="text" placeholder="Time">
-      </div>
-    </div>
-  </div>
-
-  <!-- 右下角加號 -->
-  <button class="addBtn" id="addBtn" type="button" aria-label="Add another pair">＋</button>
-</div>
-
 
     </div>
   </div>
@@ -391,7 +367,6 @@
     // ====== Build marks + numbers ======
     const face = document.getElementById("face");
 
-    // minute marks (0..59)
     for (let i = 0; i < 60; i++){
       const isHour = (i % 5 === 0);
       const d = document.createElement("div");
@@ -400,25 +375,23 @@
       face.appendChild(d);
     }
 
-// numbers 1..12 (use trig positioning)
-const R = 44; // 半徑（以鐘面 0~50% 計），想貼邊就加大到 40~42
-for (let n = 1; n <= 12; n++){
-  // 12 點位置喺頂：-90deg
-  const angle = (n * 30 - 90) * Math.PI / 180;
-  const x = 50 + R * Math.cos(angle);
-  const y = 50 + R * Math.sin(angle);
+    // numbers 1..12 (trig positioning)
+    const R = 44;
+    for (let n = 1; n <= 12; n++){
+      const angle = (n * 30 - 90) * Math.PI / 180;
+      const x = 50 + R * Math.cos(angle);
+      const y = 50 + R * Math.sin(angle);
 
-  const el = document.createElement("div");
-  el.className = "num";
-  el.textContent = String(n);
-  el.style.left = x + "%";
-  el.style.top  = y + "%";
-  face.appendChild(el);
-}
-
+      const el = document.createElement("div");
+      el.className = "num";
+      el.textContent = String(n);
+      el.style.left = x + "%";
+      el.style.top  = y + "%";
+      face.appendChild(el);
+    }
 
     // ====== Online sync via Apps Script ======
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydFg6fSuA9KQn5ZY42PRn2t09tq2Kqbrsv3TlqDPIVyNpNEadheHSmr3t2bZGxONEh/exec"; // <-- replace
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydFg6fSuA9KQn5ZY42PRn2t09tq2Kqbrsv3TlqDPIVyNpNEadheHSmr3t2bZGxONEh/exec";
     const TZ = "Asia/Hong_Kong";
 
     const hHand = document.getElementById("hHand");
@@ -501,33 +474,154 @@ for (let n = 1; n <= 12; n++){
       setInterval(syncOnce, 5 * 60 * 1000);
     })();
 
-    // ====== Add-group button ======
-const groupsEl = document.getElementById("groups");
-const addBtn = document.getElementById("addBtn");
+    // ====== Smart groups: max 4, delete, auto font sizing ======
+    const MAX_GROUPS = 4;
 
-function createGroup(){
-  const group = document.createElement("div");
-  group.className = "group";
-  group.innerHTML = `
-    <div class="field main">
-      <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
-    </div>
-    <div class="field time">
-      <input class="timeInput" type="text" placeholder="Time">
-    </div>
-  `;
-  return group;
-}
+    const sideEl = document.getElementById("side");
+    const groupsEl = document.getElementById("groups");
+    const addBtn = document.getElementById("addBtn");
 
-addBtn.addEventListener("click", () => {
-  const g = createGroup();
-  groupsEl.appendChild(g);
+    // Desired max when only 1 group
+    const MAX_MAIN_FONT = 50;
+    const MAX_TIME_FONT = 30;
 
-  // focus new main textarea for quick typing
-  const ta = g.querySelector("textarea");
-  if (ta) ta.focus();
-});
+    // Keep ratio close to your 50:30 = 5:3 (time/main = 0.6)
+    const TIME_RATIO = 0.60;
 
+    // Lower bounds (so it won't become unreadable)
+    const MIN_MAIN_FONT = 20;
+    const MIN_TIME_FONT = 14;
+
+    function groupCount(){
+      return groupsEl.querySelectorAll(".group").length;
+    }
+
+    function refreshAddButtonState(){
+      addBtn.disabled = groupCount() >= MAX_GROUPS;
+    }
+
+    function clearGroupInputs(groupEl){
+      const ta = groupEl.querySelector("textarea");
+      const ti = groupEl.querySelector("input");
+      if (ta) ta.value = "";
+      if (ti) ti.value = "";
+      if (ta) ta.focus();
+    }
+
+    function attachDeleteHandler(groupEl){
+      const del = groupEl.querySelector(".delBtn");
+      if (!del) return;
+
+      del.addEventListener("click", () => {
+        const n = groupCount();
+        if (n <= 1){
+          clearGroupInputs(groupEl);
+          return;
+        }
+        groupEl.remove();
+        updateSmartLayout();
+      });
+    }
+
+    function createGroup(){
+      const group = document.createElement("div");
+      group.className = "group";
+      group.innerHTML = `
+        <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
+        <div class="field main">
+          <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+        </div>
+        <div class="field time">
+          <input class="timeInput" type="text" placeholder="Time">
+        </div>
+      `;
+      attachDeleteHandler(group);
+      return group;
+    }
+
+    addBtn.addEventListener("click", () => {
+      if (groupCount() >= MAX_GROUPS) return;
+      const g = createGroup();
+      groupsEl.appendChild(g);
+      updateSmartLayout();
+      const ta = g.querySelector("textarea");
+      if (ta) ta.focus();
+    });
+
+    // Attach delete handler for initial group
+    groupsEl.querySelectorAll(".group").forEach(attachDeleteHandler);
+
+    function pxToNum(px){
+      const n = Number(String(px).replace("px",""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function getInnerHeight(el){
+      // clientHeight includes padding; we subtract padding to get content box height
+      const cs = getComputedStyle(el);
+      const pt = pxToNum(cs.paddingTop);
+      const pb = pxToNum(cs.paddingBottom);
+      return Math.max(0, el.clientHeight - pt - pb);
+    }
+
+    function computeMaxFontForOneLine(fieldEl, lineHeightMultiplier){
+      // Ensure at least one line is fully visible without clipping
+      const innerH = getInnerHeight(fieldEl);
+      // textarea/input has its own padding (2px top/bottom) inside; be safe:
+      const safety = 6;
+      const usable = Math.max(0, innerH - safety);
+      return Math.floor(usable / lineHeightMultiplier);
+    }
+
+    function updateSmartLayout(){
+      refreshAddButtonState();
+
+      // Let layout settle (important after add/remove)
+      requestAnimationFrame(() => {
+        const groups = Array.from(groupsEl.querySelectorAll(".group"));
+        if (groups.length === 0) return;
+
+        // Use the smallest (most constrained) heights
+        let minMainField = Infinity;
+        let minTimeField = Infinity;
+
+        for (const g of groups){
+          const mainField = g.querySelector(".field.main");
+          const timeField = g.querySelector(".field.time");
+          if (mainField) minMainField = Math.min(minMainField, mainField.clientHeight);
+          if (timeField) minTimeField = Math.min(minTimeField, timeField.clientHeight);
+        }
+
+        // Compute height-based max font sizes (smart)
+        // main textarea line-height ~ 1.08
+        // time input line-height ~ 1.10 (close enough)
+        const mainHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.main"), 1.08);
+        const timeHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.time"), 1.10);
+
+        // Start from the target maxima, then clamp to what height allows.
+        let main = Math.min(MAX_MAIN_FONT, mainHeightMax);
+        // Keep ratio for time, but also respect time field height.
+        let time = Math.min(MAX_TIME_FONT, Math.floor(main * TIME_RATIO), timeHeightMax);
+
+        // If time got limited by its own height too much, also reduce main to keep balance.
+        // (Optional, but helps if time field is very short.)
+        const impliedMainFromTime = Math.floor(time / TIME_RATIO);
+        main = Math.min(main, impliedMainFromTime);
+
+        // Lower bounds
+        main = Math.max(MIN_MAIN_FONT, main);
+        time = Math.max(MIN_TIME_FONT, time);
+
+        sideEl.style.setProperty("--mainFont", main + "px");
+        sideEl.style.setProperty("--timeFont", time + "px");
+      });
+    }
+
+    // Update on resize/orientation changes
+    window.addEventListener("resize", updateSmartLayout);
+
+    // Initial layout
+    updateSmartLayout();
   </script>
 </body>
 </html>
