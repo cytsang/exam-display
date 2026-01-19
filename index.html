@@ -87,18 +87,18 @@
 
     /* numbers 1-12 */
     .num{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform: translate(-50%, -50%);
-      font-variant-numeric: tabular-nums;
-      font-weight: 850;
-      font-size: clamp(18px, 2.2vw, 26px);
-      color: rgba(17,24,39,.75);
-      user-select: none;
-      pointer-events: none;
-      text-shadow: 0 1px 0 rgba(255,255,255,.6);
-    }
+  position:absolute;
+  transform: translate(-50%, -50%);
+  font-variant-numeric: tabular-nums;
+  font-weight: 850;
+  font-size: clamp(18px, 2.2vw, 26px);
+  color: rgba(17,24,39,.75);
+  user-select: none;
+  pointer-events: none;
+  text-shadow: 0 1px 0 rgba(255,255,255,.6);
+  z-index: 2; /* 確保喺刻度之上 */
+}
+
 
     /* hands */
     .hand{
@@ -263,17 +263,22 @@
       face.appendChild(d);
     }
 
-    // numbers 1..12
-    // place them slightly inside the hour marks
-    const numberRadius = 38; // percent-ish via translateY; tuned by feel
-    for (let n = 1; n <= 12; n++){
-      const angleDeg = (n * 30) - 90; // 12 at top
-      const el = document.createElement("div");
-      el.className = "num";
-      el.textContent = String(n);
-      el.style.transform = `translate(-50%, -50%) rotate(${angleDeg}deg) translateY(-${numberRadius}%) rotate(${-angleDeg}deg)`;
-      face.appendChild(el);
-    }
+// numbers 1..12 (use trig positioning)
+const R = 38; // 半徑（以鐘面 0~50% 計），想貼邊就加大到 40~42
+for (let n = 1; n <= 12; n++){
+  // 12 點位置喺頂：-90deg
+  const angle = (n * 30 - 90) * Math.PI / 180;
+  const x = 50 + R * Math.cos(angle);
+  const y = 50 + R * Math.sin(angle);
+
+  const el = document.createElement("div");
+  el.className = "num";
+  el.textContent = String(n);
+  el.style.left = x + "%";
+  el.style.top  = y + "%";
+  face.appendChild(el);
+}
+
 
     // ====== Online sync via Apps Script ======
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydFg6fSuA9KQn5ZY42PRn2t09tq2Kqbrsv3TlqDPIVyNpNEadheHSmr3t2bZGxONEh/exec"; // <-- replace
