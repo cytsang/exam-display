@@ -316,6 +316,71 @@
       .groups{ padding-right: 0; }
       .addBtn{ right: 12px; bottom: 12px; }
     }
+
+    /* ===== Right-side textbox: simple big-word style (like your sample) ===== */
+
+/* remove card-like look */
+.field{
+  background: #ffffff !important;
+  border: 2px solid #111 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  padding: 6px 14px !important;
+}
+
+/* make each group look airy */
+.group{
+  gap: 14px;
+}
+
+/* main textarea: very big, centered */
+.field.main textarea{
+  text-align: center !important;
+  font-weight: 800 !important;
+  letter-spacing: .3px !important;
+  line-height: 1.05 !important;
+  padding: 0 !important;       /* tighter like the sample */
+}
+
+/* time input: very big, centered */
+.field.time input{
+  text-align: center !important;
+  font-weight: 800 !important;
+  letter-spacing: .3px !important;
+  padding: 0 !important;
+}
+
+/* placeholder also centered and lighter */
+.field textarea::placeholder,
+.field input::placeholder{
+  text-align: center;
+  color: rgba(17,17,17,.35) !important;
+  font-weight: 700 !important;
+}
+
+/* optional: remove the grey border theme variables influence */
+:root{
+  --border: #111;
+  --panel: #fff;
+}
+
+/* make delete button and plus button match the simple style */
+.delBtn, .addBtn{
+  border: 2px solid #111 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+.delBtn{
+  width: 36px;
+  height: 36px;
+  font-size: 22px;
+}
+.addBtn{
+  width: 60px;
+  height: 60px;
+  font-size: 40px;
+}
+
   </style>
 </head>
 
