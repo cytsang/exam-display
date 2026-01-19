@@ -195,9 +195,20 @@
       display:flex;
       overflow:hidden;
     }
-    .field.level   { flex: 2; }
-    .field.subject { flex: 4; }
-    .field.time    { flex: 1; }
+    .field.main { flex: 5; }
+    .field.time { flex: 4; }
+
+    .field.main input{
+  font-size: 50px;  /* 5份 */
+  font-weight: 850;
+}
+
+.field.time input{
+  font-size: 40px;  /* 4份 */
+  font-weight: 850;
+}
+
+
 
     input{
       width:100%;
@@ -245,10 +256,15 @@
       </div>
 
       <div class="side">
-        <div class="field level"><input type="text" placeholder="Level"></div>
-        <div class="field subject"><input type="text" placeholder="Subject / Paper"></div>
-        <div class="field time"><input type="text" placeholder="Time"></div>
-      </div>
+  <div class="field main">
+    <input id="main" type="text" placeholder="Level / Subj / Paper">
+  </div>
+
+  <div class="field time">
+    <input id="time" type="text" placeholder="Time">
+  </div>
+</div>
+
     </div>
   </div>
 
