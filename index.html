@@ -8,11 +8,10 @@
   <style>
     :root{
       --bg:#ffffff;
-      --panel:#f6f7f9;
-      --border:#d9dde3;
       --text:#111827;
       --muted:#9aa3af;
-      --radius:18px;
+      --radius:10px;
+      --borderColor:#111;
     }
 
     *{ box-sizing:border-box; }
@@ -38,7 +37,7 @@
       align-items:center;
     }
 
-    /* LEFT */
+    /* LEFT (Clock) */
     .clockShell{
       flex: 1 1 60%;
       display:flex;
@@ -49,7 +48,7 @@
     .clockCircle{
       width: min(560px, 68vw);
       aspect-ratio: 1 / 1;
-      border: 10px solid #2563eb;         /* blue border */
+      border: 10px solid #2563eb;
       border-radius: 999px;
       background: #fff;
       box-shadow: 0 12px 30px rgba(37,99,235,.25);
@@ -68,10 +67,9 @@
       background:
         radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
         radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
-        #fff7cc; /* pale yellow */
+        #fff7cc;
     }
 
-    /* marks */
     .mark{
       position:absolute;
       left:50%;
@@ -87,10 +85,8 @@
       width: 3px;
       height: 12px;
       background: rgba(17,24,39,.22);
-      border-radius: 6px;
     }
 
-    /* numbers 1-12 */
     .num{
       position:absolute;
       transform: translate(-50%, -50%);
@@ -104,7 +100,6 @@
       z-index: 2;
     }
 
-    /* hands */
     .hand{
       position:absolute;
       left:50%;
@@ -160,26 +155,26 @@
       transform: translateX(-50%);
       text-align:center;
       padding: 10px 14px;
-      border: 1px solid var(--border);
+      border: 1.5px solid rgba(0,0,0,.18);
       border-radius: 14px;
-      background: rgba(246,247,249,.88);
+      background: rgba(255,255,255,.85);
       backdrop-filter: blur(6px);
       min-width: 240px;
       z-index: 8;
     }
     .digital{
       font-variant-numeric: tabular-nums;
-      font-weight: 850;
+      font-weight: 900;
       font-size: 24px;
       letter-spacing: .5px;
     }
     .status{
       margin-top: 4px;
       font-size: 12px;
-      color: #6b7280;
+      color: #374151;
     }
 
-    /* RIGHT (dynamic groups) */
+    /* RIGHT (Dynamic groups) */
     .side{
       flex: 0 0 min(520px, 100%);
       display:flex;
@@ -208,42 +203,68 @@
       flex-direction:column;
       gap: 14px;
       min-height: 0;
-      position: relative; /* for delete button */
+      position: relative;
     }
 
+    /* Simple big-word textbox style */
     .field{
-      background: var(--panel);
-      border: 2px solid var(--border);
+      background: #fff;
+      border: 2px solid var(--borderColor);
       border-radius: var(--radius);
-      box-shadow: 0 8px 18px rgba(0,0,0,.05);
-      padding: 14px 16px;
+      box-shadow: none;
+      padding: 6px 14px;
       display:flex;
       overflow:hidden;
       min-height: 0;
+      position: relative;
     }
 
     /* height ratio 5:4 inside each group */
     .field.main { flex: 5; }
     .field.time { flex: 4; }
 
-    /* multi-line main */
+    /* MAIN: display layer (centered) */
+    .mainDisplay{
+      position:absolute;
+      inset: 0;
+      display:flex;
+      align-items:center;        /* vertical center */
+      justify-content:center;    /* horizontal center */
+      text-align:center;
+      font-size: var(--mainFont);
+      font-weight: 800;
+      letter-spacing: .3px;
+      line-height: 1.05;
+      color: var(--text);
+      white-space: pre-wrap;
+      pointer-events:none;
+      padding: 0 10px;           /* avoid touching borders */
+    }
+    .mainDisplay.empty{
+      color: rgba(17,17,17,.35);
+      font-weight: 800;
+    }
+
+    /* MAIN textarea: for input only (invisible text, keep caret) */
     .field.main textarea{
       width:100%;
       height:100%;
       border:0;
       outline:none;
       background:transparent;
-      color: var(--text);
+      color: transparent;     /* hide typed text */
+      caret-color: #111;      /* keep caret visible */
       font-size: var(--mainFont);
-      font-weight: 850;
-      letter-spacing: .2px;
-      line-height: 1.08;
-      resize: none;
-      padding: 2px 2px;
-      overflow: hidden; /* keep clean */
+      font-weight: 800;
+      letter-spacing: .3px;
+      line-height: 1.05;
+      resize:none;
+      padding: 0 10px;
+      overflow: hidden;
+      text-align:center;
     }
 
-    /* time (single line) */
+    /* TIME input */
     .field.time input{
       width:100%;
       height:100%;
@@ -252,15 +273,17 @@
       background:transparent;
       color: var(--text);
       font-size: var(--timeFont);
-      font-weight: 850;
-      letter-spacing: .2px;
-      padding: 2px 2px;
+      font-weight: 800;
+      letter-spacing: .3px;
+      padding: 0;
+      text-align:center;
     }
 
-    .field textarea::placeholder,
+    /* placeholders (time uses native placeholder; main handled by display layer) */
     .field input::placeholder{
-      color: var(--muted);
-      font-weight: 750;
+      text-align: center;
+      color: rgba(17,17,17,.35);
+      font-weight: 800;
     }
 
     /* plus button */
@@ -268,13 +291,13 @@
       position:absolute;
       right: 8px;
       bottom: 8px;
-      width: 54px;
-      height: 54px;
+      width: 60px;
+      height: 60px;
       border-radius: 999px;
-      border: 2px solid var(--border);
-      background: #ffffff;
-      box-shadow: 0 10px 22px rgba(0,0,0,.10);
-      font-size: 34px;
+      border: 2px solid var(--borderColor);
+      background: #fff;
+      box-shadow: none;
+      font-size: 40px;
       line-height: 1;
       font-weight: 900;
       cursor: pointer;
@@ -291,12 +314,12 @@
       position: absolute;
       right: 10px;
       top: 10px;
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: 999px;
-      border: 2px solid var(--border);
-      background: #ffffff;
-      box-shadow: 0 8px 16px rgba(0,0,0,.10);
+      border: 2px solid var(--borderColor);
+      background: #fff;
+      box-shadow: none;
       font-size: 22px;
       font-weight: 900;
       line-height: 1;
@@ -316,79 +339,6 @@
       .groups{ padding-right: 0; }
       .addBtn{ right: 12px; bottom: 12px; }
     }
-
-    /* ===== Right-side textbox: simple big-word style (like your sample) ===== */
-
-/* remove card-like look */
-.field{
-  background: #ffffff !important;
-  border: 2px solid #111 !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  padding: 6px 14px !important;
-}
-
-/* make each group look airy */
-.group{
-  gap: 14px;
-}
-
-/* main textarea: very big, centered */
-.field.main textarea{
-  text-align: center !important;
-  font-weight: 800 !important;
-  letter-spacing: .3px !important;
-  line-height: 1.05 !important;
-  padding: 0 !important;       /* tighter like the sample */
-}
-
-/* time input: very big, centered */
-.field.time input{
-  text-align: center !important;
-  font-weight: 800 !important;
-  letter-spacing: .3px !important;
-  padding: 0 !important;
-}
-
-/* placeholder also centered and lighter */
-.field textarea::placeholder,
-.field input::placeholder{
-  text-align: center;
-  color: rgba(17,17,17,.35) !important;
-  font-weight: 700 !important;
-}
-
-/* optional: remove the grey border theme variables influence */
-:root{
-  --border: #111;
-  --panel: #fff;
-}
-
-/* make delete button and plus button match the simple style */
-.delBtn, .addBtn{
-  border: 2px solid #111 !important;
-  background: #fff !important;
-  box-shadow: none !important;
-}
-.delBtn{
-  width: 36px;
-  height: 36px;
-  font-size: 22px;
-}
-.addBtn{
-  width: 60px;
-  height: 60px;
-  font-size: 40px;
-}
-
-    /* === Vertically center text inside the big textarea === */
-.field.main textarea{
-  display: flex;
-  align-items: center;     /* 垂直置中 */
-  justify-content: center; /* 水平置中（保險） */
-  text-align: center;
-}
-
   </style>
 </head>
 
@@ -421,6 +371,7 @@
             <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
 
             <div class="field main">
+              <div class="mainDisplay empty" aria-hidden="true">Level / Subj / Paper</div>
               <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
             </div>
 
@@ -448,13 +399,11 @@
       face.appendChild(d);
     }
 
-    // numbers 1..12 (trig positioning)
     const R = 44;
     for (let n = 1; n <= 12; n++){
       const angle = (n * 30 - 90) * Math.PI / 180;
       const x = 50 + R * Math.cos(angle);
       const y = 50 + R * Math.sin(angle);
-
       const el = document.createElement("div");
       el.className = "num";
       el.textContent = String(n);
@@ -547,7 +496,7 @@
       setInterval(syncOnce, 5 * 60 * 1000);
     })();
 
-    // ====== Smart groups: max 3, delete, auto font sizing ======
+    // ====== Groups: max 3, delete, add, smart font sizing, main-display sync ======
     const MAX_GROUPS = 3;
 
     const sideEl = document.getElementById("side");
@@ -558,10 +507,10 @@
     const MAX_MAIN_FONT = 50;
     const MAX_TIME_FONT = 30;
 
-    // Keep ratio close to your 50:30 = 5:3 (time/main = 0.6)
+    // time/main ratio (30/50)
     const TIME_RATIO = 0.60;
 
-    // Lower bounds (so it won't become unreadable)
+    // Lower bounds
     const MIN_MAIN_FONT = 20;
     const MIN_TIME_FONT = 14;
 
@@ -574,10 +523,11 @@
     }
 
     function clearGroupInputs(groupEl){
-      const ta = groupEl.querySelector("textarea");
-      const ti = groupEl.querySelector("input");
+      const ta = groupEl.querySelector(".mainInput");
+      const ti = groupEl.querySelector(".timeInput");
       if (ta) ta.value = "";
       if (ti) ti.value = "";
+      syncMainDisplays();
       if (ta) ta.focus();
     }
 
@@ -593,6 +543,7 @@
         }
         groupEl.remove();
         updateSmartLayout();
+        syncMainDisplays();
       });
     }
 
@@ -601,14 +552,24 @@
       group.className = "group";
       group.innerHTML = `
         <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
+
         <div class="field main">
+          <div class="mainDisplay empty" aria-hidden="true">Level / Subj / Paper</div>
           <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
         </div>
+
         <div class="field time">
           <input class="timeInput" type="text" placeholder="Time">
         </div>
       `;
       attachDeleteHandler(group);
+
+      // sync display on new textarea input
+      const ta = group.querySelector(".mainInput");
+      if (ta){
+        ta.addEventListener("input", syncMainDisplays);
+        ta.addEventListener("blur", syncMainDisplays);
+      }
       return group;
     }
 
@@ -617,12 +578,38 @@
       const g = createGroup();
       groupsEl.appendChild(g);
       updateSmartLayout();
-      const ta = g.querySelector("textarea");
+      syncMainDisplays();
+      const ta = g.querySelector(".mainInput");
       if (ta) ta.focus();
     });
 
-    // Attach delete handler for initial group
-    groupsEl.querySelectorAll(".group").forEach(attachDeleteHandler);
+    // Main display sync (vertical centering)
+    function syncMainDisplays(){
+      groupsEl.querySelectorAll(".group").forEach(group => {
+        const ta = group.querySelector(".mainInput");
+        const display = group.querySelector(".mainDisplay");
+        if (!ta || !display) return;
+
+        const v = ta.value.trim();
+        if (v === ""){
+          display.textContent = ta.placeholder || "";
+          display.classList.add("empty");
+        }else{
+          display.textContent = ta.value; // keep line breaks
+          display.classList.remove("empty");
+        }
+      });
+    }
+
+    // attach initial group handlers
+    groupsEl.querySelectorAll(".group").forEach(g => {
+      attachDeleteHandler(g);
+      const ta = g.querySelector(".mainInput");
+      if (ta){
+        ta.addEventListener("input", syncMainDisplays);
+        ta.addEventListener("blur", syncMainDisplays);
+      }
+    });
 
     function pxToNum(px){
       const n = Number(String(px).replace("px",""));
@@ -630,7 +617,6 @@
     }
 
     function getInnerHeight(el){
-      // clientHeight includes padding; we subtract padding to get content box height
       const cs = getComputedStyle(el);
       const pt = pxToNum(cs.paddingTop);
       const pb = pxToNum(cs.paddingBottom);
@@ -638,9 +624,7 @@
     }
 
     function computeMaxFontForOneLine(fieldEl, lineHeightMultiplier){
-      // Ensure at least one line is fully visible without clipping
       const innerH = getInnerHeight(fieldEl);
-      // textarea/input has its own padding (2px top/bottom) inside; be safe:
       const safety = 6;
       const usable = Math.max(0, innerH - safety);
       return Math.floor(usable / lineHeightMultiplier);
@@ -649,39 +633,20 @@
     function updateSmartLayout(){
       refreshAddButtonState();
 
-      // Let layout settle (important after add/remove)
       requestAnimationFrame(() => {
         const groups = Array.from(groupsEl.querySelectorAll(".group"));
         if (groups.length === 0) return;
 
-        // Use the smallest (most constrained) heights
-        let minMainField = Infinity;
-        let minTimeField = Infinity;
+        const mainHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.main"), 1.05);
+        const timeHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.time"), 1.05);
 
-        for (const g of groups){
-          const mainField = g.querySelector(".field.main");
-          const timeField = g.querySelector(".field.time");
-          if (mainField) minMainField = Math.min(minMainField, mainField.clientHeight);
-          if (timeField) minTimeField = Math.min(minTimeField, timeField.clientHeight);
-        }
-
-        // Compute height-based max font sizes (smart)
-        // main textarea line-height ~ 1.08
-        // time input line-height ~ 1.10 (close enough)
-        const mainHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.main"), 1.08);
-        const timeHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.time"), 1.10);
-
-        // Start from the target maxima, then clamp to what height allows.
         let main = Math.min(MAX_MAIN_FONT, mainHeightMax);
-        // Keep ratio for time, but also respect time field height.
         let time = Math.min(MAX_TIME_FONT, Math.floor(main * TIME_RATIO), timeHeightMax);
 
-        // If time got limited by its own height too much, also reduce main to keep balance.
-        // (Optional, but helps if time field is very short.)
+        // keep ratio coherent
         const impliedMainFromTime = Math.floor(time / TIME_RATIO);
         main = Math.min(main, impliedMainFromTime);
 
-        // Lower bounds
         main = Math.max(MIN_MAIN_FONT, main);
         time = Math.max(MIN_TIME_FONT, time);
 
@@ -689,21 +654,15 @@
         sideEl.style.setProperty("--timeFont", time + "px");
       });
     }
-    
-/* === Use SAME font style for main and time === */
-.field.main textarea,
-.field.time input{
-  font-family: inherit;
-  font-weight: 800;
-  letter-spacing: .3px;
-}
 
-    // Update on resize/orientation changes
-    window.addEventListener("resize", updateSmartLayout);
+    window.addEventListener("resize", () => {
+      updateSmartLayout();
+      syncMainDisplays();
+    });
 
-    // Initial layout
+    // Initial
     updateSmartLayout();
-
+    syncMainDisplays();
   </script>
 </body>
 </html>
