@@ -223,48 +223,27 @@
     .field.main { flex: 5; }
     .field.time { flex: 4; }
 
-    /* MAIN: display layer (centered) */
-    .mainDisplay{
-      position:absolute;
-      inset: 0;
-      display:flex;
-      align-items:center;        /* vertical center */
-      justify-content:center;    /* horizontal center */
-      text-align:center;
-      font-size: var(--mainFont);
-      font-weight: 800;
-      letter-spacing: .3px;
-      line-height: 1.05;
-      color: var(--text);
-      white-space: pre-wrap;
-      pointer-events:none;
-      padding: 0 10px;           /* avoid touching borders */
-    }
-    .mainDisplay.empty{
-      color: rgba(17,17,17,.35);
-      font-weight: 800;
-    }
-
-    /* MAIN textarea: for input only (invisible text, keep caret) */
+    /* MAIN textarea: normal top-aligned display (no vertical centering overlay) */
     .field.main textarea{
       width:100%;
       height:100%;
       border:0;
       outline:none;
       background:transparent;
-      color: transparent;     /* hide typed text */
-      caret-color: #111;      /* keep caret visible */
+      color: var(--text);
+      caret-color: #111;
       font-size: var(--mainFont);
-      font-weight: 800;
+      font-weight: 850;      /* main = bold */
       letter-spacing: .3px;
       line-height: 1.05;
       resize:none;
-      padding: 0 10px;
+      padding: 0;
       overflow: hidden;
       text-align:center;
+      display:block;
     }
 
-    /* TIME input */
+    /* TIME input: NOT bold */
     .field.time input{
       width:100%;
       height:100%;
@@ -273,17 +252,22 @@
       background:transparent;
       color: var(--text);
       font-size: var(--timeFont);
-      font-weight: 800;
+      font-weight: 400;      /* time = not bold */
       letter-spacing: .3px;
       padding: 0;
       text-align:center;
     }
 
-    /* placeholders (time uses native placeholder; main handled by display layer) */
-    .field input::placeholder{
+    /* placeholders */
+    .field textarea::placeholder{
       text-align: center;
       color: rgba(17,17,17,.35);
-      font-weight: 800;
+      font-weight: 700;
+    }
+    .field.time input::placeholder{
+      text-align: center;
+      color: rgba(17,17,17,.35);
+      font-weight: 400; /* time placeholder not bold */
     }
 
     /* plus button */
@@ -371,7 +355,6 @@
             <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
 
             <div class="field main">
-              <div class="mainDisplay empty" aria-hidden="true">Level / Subj / Paper</div>
               <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
             </div>
 
@@ -496,7 +479,7 @@
       setInterval(syncOnce, 5 * 60 * 1000);
     })();
 
-    // ====== Groups: max 3, delete, add, smart font sizing, main-display sync ======
+    // ====== Groups: max 3, delete, add, smart font sizing ======
     const MAX_GROUPS = 3;
 
     const sideEl = document.getElementById("side");
@@ -507,7 +490,7 @@
     const MAX_MAIN_FONT = 50;
     const MAX_TIME_FONT = 30;
 
-    // time/main ratio (30/50)
+    // ratio based on 30/50
     const TIME_RATIO = 0.60;
 
     // Lower bounds
@@ -527,7 +510,6 @@
       const ti = groupEl.querySelector(".timeInput");
       if (ta) ta.value = "";
       if (ti) ti.value = "";
-      syncMainDisplays();
       if (ta) ta.focus();
     }
 
@@ -543,7 +525,6 @@
         }
         groupEl.remove();
         updateSmartLayout();
-        syncMainDisplays();
       });
     }
 
@@ -554,7 +535,6 @@
         <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
 
         <div class="field main">
-          <div class="mainDisplay empty" aria-hidden="true">Level / Subj / Paper</div>
           <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
         </div>
 
@@ -563,13 +543,6 @@
         </div>
       `;
       attachDeleteHandler(group);
-
-      // sync display on new textarea input
-      const ta = group.querySelector(".mainInput");
-      if (ta){
-        ta.addEventListener("input", syncMainDisplays);
-        ta.addEventListener("blur", syncMainDisplays);
-      }
       return group;
     }
 
@@ -578,38 +551,12 @@
       const g = createGroup();
       groupsEl.appendChild(g);
       updateSmartLayout();
-      syncMainDisplays();
       const ta = g.querySelector(".mainInput");
       if (ta) ta.focus();
     });
 
-    // Main display sync (vertical centering)
-    function syncMainDisplays(){
-      groupsEl.querySelectorAll(".group").forEach(group => {
-        const ta = group.querySelector(".mainInput");
-        const display = group.querySelector(".mainDisplay");
-        if (!ta || !display) return;
-
-        const v = ta.value.trim();
-        if (v === ""){
-          display.textContent = ta.placeholder || "";
-          display.classList.add("empty");
-        }else{
-          display.textContent = ta.value; // keep line breaks
-          display.classList.remove("empty");
-        }
-      });
-    }
-
-    // attach initial group handlers
-    groupsEl.querySelectorAll(".group").forEach(g => {
-      attachDeleteHandler(g);
-      const ta = g.querySelector(".mainInput");
-      if (ta){
-        ta.addEventListener("input", syncMainDisplays);
-        ta.addEventListener("blur", syncMainDisplays);
-      }
-    });
+    // Attach delete handler for initial group
+    groupsEl.querySelectorAll(".group").forEach(attachDeleteHandler);
 
     function pxToNum(px){
       const n = Number(String(px).replace("px",""));
@@ -643,7 +590,6 @@
         let main = Math.min(MAX_MAIN_FONT, mainHeightMax);
         let time = Math.min(MAX_TIME_FONT, Math.floor(main * TIME_RATIO), timeHeightMax);
 
-        // keep ratio coherent
         const impliedMainFromTime = Math.floor(time / TIME_RATIO);
         main = Math.min(main, impliedMainFromTime);
 
@@ -655,14 +601,10 @@
       });
     }
 
-    window.addEventListener("resize", () => {
-      updateSmartLayout();
-      syncMainDisplays();
-    });
+    window.addEventListener("resize", updateSmartLayout);
 
     // Initial
     updateSmartLayout();
-    syncMainDisplays();
   </script>
 </body>
 </html>
