@@ -689,20 +689,20 @@
         sideEl.style.setProperty("--timeFont", time + "px");
       });
     }
-
-    // Update on resize/orientation changes
-    window.addEventListener("resize", updateSmartLayout);
-
-    // Initial layout
-    updateSmartLayout();
-
-    /* === Use SAME font style for main and time === */
+    
+/* === Use SAME font style for main and time === */
 .field.main textarea,
 .field.time input{
   font-family: inherit;
   font-weight: 800;
   letter-spacing: .3px;
 }
+
+    // Update on resize/orientation changes
+    window.addEventListener("resize", updateSmartLayout);
+
+    // Initial layout
+    updateSmartLayout();
 
   </script>
 </body>
