@@ -434,12 +434,13 @@
 
       const {hh, mm, ss} = hkParts(d);
       const hour12 = hh % 12;
-      const ms = d.getMilliseconds();
-      const secFloat = ss + ms / 1000;
+      // 秒針：用整秒，與數碼顯示一致，對齊 1-12
+      const secDeg = ss * 6;
 
-      const secDeg = secFloat * 6;
-      const minDeg = (mm + secFloat/60) * 6;
-      const hourDeg = (hour12 + mm/60 + secFloat/3600) * 30;
+      // 分針/時針：可以保留「順滑」，用 ss 做細微推進
+      const minDeg = (mm + ss/60) * 6;
+      const hourDeg = (hour12 + mm/60 + ss/3600) * 30;
+
 
       sHand.style.transform = `translate(-50%, -100%) rotate(${secDeg}deg)`;
       mHand.style.transform = `translate(-50%, -100%) rotate(${minDeg}deg)`;
