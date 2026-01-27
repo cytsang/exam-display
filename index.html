@@ -421,7 +421,7 @@
       await syncOnce();
       tick();
       setInterval(tick, 1000);
-      setInterval(syncOnce, 5 * 60 * 1000);
+      setInterval(syncOnce, 60 * 1000);
     })();
 
     // ====== Groups: max 3, add/delete, smart font sizing ======
