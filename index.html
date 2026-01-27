@@ -1,604 +1,245 @@
 <!doctype html>
 <html lang="zh-HK">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SPSLT Exam Display</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPSLT Exam Display</title>
 
-  <style>
-    :root{
-      --bg:#ffffff;
-      --text:#111827;
-      --muted:#9aa3af;
-    }
+<style>
+:root{
+  --bg:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+}
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, "PingFang HK", "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "PingFang HK", "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
-    .wrap{
-      min-height: 100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 24px;
-    }
+.wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
 
-    .stage{
-      width: min(1100px, 100%);
-      display:flex;
-      gap: 28px;
-      align-items:center;
-    }
+.stage{
+  width:min(1100px,100%);
+  display:flex;
+  gap:28px;
+  align-items:center;
+}
 
-    /* LEFT (Clock) */
-    .clockShell{
-      flex: 1 1 60%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+/* ===== CLOCK ===== */
+.clockShell{ flex:1 1 60%; display:flex; justify-content:center; }
 
-    .clockCircle{
-      width: min(560px, 68vw);
-      aspect-ratio: 1 / 1;
-      border: 10px solid #2563eb;
-      border-radius: 999px;
-      background: #fff;
-      box-shadow: 0 12px 30px rgba(37,99,235,.25);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 16px;
-      position: relative;
-    }
+.clockCircle{
+  width:min(560px,68vw);
+  aspect-ratio:1/1;
+  border:10px solid #2563eb;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 12px 30px rgba(37,99,235,.25);
+  padding:16px;
+}
 
-    .face{
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      position: relative;
-      background:
-        radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
-        radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
-        #fff7cc;
-    }
+.face{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  position:relative;
+  background:
+    radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
+    radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
+    #fff7cc;
+}
 
-    .mark{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width: 7px;
-      height: 22px;
-      background: rgba(17,24,39,.70);
-      border-radius: 6px;
-      transform: translate(-50%, -50%) rotate(0deg) translateY(-46%);
-      z-index: 1;
-    }
-    .mark.minor{
-      width: 3px;
-      height: 12px;
-      background: rgba(17,24,39,.22);
-    }
+/* marks */
+.mark{
+  position:absolute;
+  left:50%; top:50%;
+  width:7px; height:22px;
+  background:rgba(17,24,39,.7);
+  border-radius:6px;
+  transform:translate(-50%,-50%) rotate(0deg) translateY(-46%);
+}
+.mark.minor{
+  width:3px; height:12px;
+  background:rgba(17,24,39,.25);
+}
 
-    /* numbers 1-12 (amended: ~2x bigger) */
-    .num{
-      position:absolute;
-      transform: translate(-50%, -50%);
-      font-variant-numeric: tabular-nums;
-      font-weight: 900;
-      font-size: clamp(36px, 4.4vw, 52px); /* doubled */
-      color: rgba(17,24,39,.82);
-      user-select: none;
-      pointer-events: none;
-      text-shadow: 0 1px 0 rgba(255,255,255,.6);
-      z-index: 2;
-    }
+/* numbers (2x size) */
+.num{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  font-weight:900;
+  font-size:clamp(36px,4.5vw,52px);
+  color:rgba(17,24,39,.85);
+  user-select:none;
+}
 
-    .hand{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform-origin: 50% 100%;
-      border-radius: 999px;
-      transform: translate(-50%, -100%) rotate(0deg);
-      box-shadow: 0 6px 14px rgba(0,0,0,.08);
-      z-index: 4;
-    }
-    .hand.hour{
-      width: 14px;
-      height: 30%;
-      background: rgba(17,24,39,.90);
-    }
-    .hand.minute{
-      width: 10px;
-      height: 42%;
-      background: rgba(17,24,39,.82);
-    }
-    .hand.second{
-      width: 3px;
-      height: 48%;
-      background: rgba(220,38,38,.95);
-      box-shadow: none;
-      z-index: 6;
-    }
+/* hands */
+.hand{
+  position:absolute;
+  left:50%; top:50%;
+  transform-origin:50% 100%;
+  transform:translate(-50%,-100%) rotate(0deg);
+  border-radius:999px;
+}
+.hand.hour{ width:14px; height:30%; background:#111827; }
+.hand.minute{ width:10px; height:42%; background:#1f2937; }
+.hand.second{ width:3px; height:48%; background:#dc2626; }
 
-    .hub{
-      position:absolute;
-      left:50%;
-      top:50%;
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      transform: translate(-50%,-50%);
-      background: rgba(17,24,39,.96);
-      box-shadow: 0 2px 10px rgba(0,0,0,.18);
-      z-index: 7;
-    }
-    .hub::after{
-      content:"";
-      position:absolute;
-      inset: 4px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.18);
-    }
+.hub{
+  position:absolute;
+  left:50%; top:50%;
+  width:18px; height:18px;
+  background:#111827;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+}
 
-    /* Digital clock readout (amended) */
-    .readout{
-      position:absolute;
-      left:50%;
-      bottom: 11%;              /* moved up */
-      transform: translateX(-50%);
-      text-align:center;
-      padding: 10px 14px;
-      border: 1.5px solid rgba(0,0,0,.18);
-      border-radius: 14px;
-      background: rgba(255,255,255,.85);
-      backdrop-filter: blur(6px);
-      min-width: 240px;         /* keep size */
-      z-index: 8;
-    }
+/* ===== DIGITAL READOUT (AMENDED) ===== */
+.readout{
+  position:absolute;
+  left:50%;
+  bottom:18%;                 /* 🔼 再上移：接近中心點下方 */
+  transform:translateX(-50%);
+  text-align:center;
+  background:rgba(255,255,255,.9);
+  border-radius:14px;
+  padding:10px 16px;
+  min-width:260px;
+}
 
-    /* make the digits fill the box more */
-    .digital{
-      font-variant-numeric: tabular-nums;
-      font-weight: 900;
-      font-size: 38px;          /* larger to occupy the box */
-      line-height: 1.05;
-      letter-spacing: .5px;
-    }
+.digital{
+  font-weight:900;
+  font-size:44px;             /* 🔍 再加大 */
+  line-height:1.05;
+  letter-spacing:.5px;
+}
 
-    /* make "online synced" smaller */
-    .status{
-      margin-top: 4px;
-      font-size: 11px;          /* slightly smaller */
-      line-height: 1.05;
-      color: #374151;
-    }
+.status{
+  font-size:10px;             /* 🔽 再縮細 */
+  color:var(--muted);
+  margin-top:2px;
+}
 
-    /* RIGHT (Dynamic groups) */
-    .side{
-      flex: 0 0 min(520px, 100%);
-      display:flex;
-      flex-direction:column;
-      gap: 16px;
-      height: min(520px, 70vh);
-      position: relative;
+/* ===== RIGHT SIDE ===== */
+.side{
+  flex:0 0 min(520px,100%);
+  display:flex;
+  flex-direction:column;
+  height:min(520px,70vh);
+  --mainFont:50px;
+  --timeFont:30px;
+}
 
-      --mainFont: 50px;
-      --timeFont: 30px;
-    }
+.groups{ flex:1; display:flex; flex-direction:column; gap:18px; }
 
-    .groups{
-      flex: 1;
-      display:flex;
-      flex-direction:column;
-      gap: 18px;
-      min-height: 0;
-      padding-right: 70px;
-    }
+.group{ flex:1; display:flex; flex-direction:column; gap:14px; }
 
-    .group{
-      flex: 1;
-      display:flex;
-      flex-direction:column;
-      gap: 14px;
-      min-height: 0;
-      position: relative;
-    }
+.field{ border:none; background:transparent; }
 
-    /* Textboxes with NO obvious border (as requested earlier) */
-    .field{
-      background: transparent;
-      border: none;
-      border-radius: 10px;
-      box-shadow: none;
-      padding: 0;
-      display:flex;
-      overflow:hidden;
-      min-height: 0;
-      position: relative;
-    }
+.field.main textarea{
+  width:100%; height:100%;
+  border:none; outline:none;
+  font-size:var(--mainFont);
+  font-weight:850;
+  text-align:center;
+  background:transparent;
+}
 
-    .field.main { flex: 5; }
-    .field.time { flex: 4; }
+.field.time input{
+  width:100%;
+  border:none; outline:none;
+  font-size:var(--timeFont);
+  font-weight:400;
+  text-align:center;
+  background:transparent;
+}
 
-    .field.main textarea{
-      width:100%;
-      height:100%;
-      border:0;
-      outline:none;
-      background:transparent;
-      color: var(--text);
-      caret-color: #111;
-      font-size: var(--mainFont);
-      font-weight: 850;      /* main bold */
-      letter-spacing: .3px;
-      line-height: 1.05;
-      resize:none;
-      padding: 0;
-      overflow: hidden;
-      text-align:center;
-      display:block;
-    }
+.addBtn, .delBtn{
+  border:none;
+  background:#fff;
+  font-size:32px;
+  cursor:pointer;
+}
 
-    .field.time input{
-      width:100%;
-      height:100%;
-      border:0;
-      outline:none;
-      background:transparent;
-      color: var(--text);
-      font-size: var(--timeFont);
-      font-weight: 400;      /* time not bold */
-      letter-spacing: .3px;
-      padding: 0;
-      text-align:center;
-    }
-
-    .field textarea::placeholder{
-      text-align: center;
-      color: rgba(17,17,17,.35);
-      font-weight: 700;
-    }
-    .field.time input::placeholder{
-      text-align: center;
-      color: rgba(17,17,17,.35);
-      font-weight: 400;
-    }
-
-    .addBtn{
-      position:absolute;
-      right: 8px;
-      bottom: 8px;
-      width: 60px;
-      height: 60px;
-      border-radius: 999px;
-      border: 2px solid rgba(0,0,0,.15);
-      background: #fff;
-      box-shadow: none;
-      font-size: 40px;
-      line-height: 1;
-      font-weight: 900;
-      cursor: pointer;
-      user-select:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .addBtn:active{ transform: translateY(1px); }
-    .addBtn[disabled]{ opacity:.45; cursor:not-allowed; }
-
-    .delBtn{
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      width: 36px;
-      height: 36px;
-      border-radius: 999px;
-      border: 2px solid rgba(0,0,0,.15);
-      background: #fff;
-      box-shadow: none;
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1;
-      cursor: pointer;
-      user-select: none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index: 10;
-    }
-    .delBtn:active{ transform: translateY(1px); }
-
-    @media (max-width: 900px){
-      .stage{ flex-direction:column; }
-      .side{ width: min(560px, 100%); height: min(520px, 55vh); }
-      .clockShell{ width: 100%; }
-      .groups{ padding-right: 0; }
-      .addBtn{ right: 12px; bottom: 12px; }
-    }
-  </style>
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="stage">
+<div class="wrap">
+<div class="stage">
 
-      <!-- LEFT clock -->
-      <div class="clockShell">
-        <div class="clockCircle">
-          <div class="face" id="face">
-            <div class="hand hour" id="hHand"></div>
-            <div class="hand minute" id="mHand"></div>
-            <div class="hand second" id="sHand"></div>
-            <div class="hub"></div>
+<div class="clockShell">
+<div class="clockCircle">
+<div class="face" id="face">
+  <div class="hand hour" id="hHand"></div>
+  <div class="hand minute" id="mHand"></div>
+  <div class="hand second" id="sHand"></div>
+  <div class="hub"></div>
 
-            <div class="readout">
-              <div class="digital" id="digital">--:--:--</div>
-              <div class="status" id="syncStatus">Syncing…</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT dynamic textbox groups -->
-      <div class="side" id="side">
-        <div class="groups" id="groups">
-          <!-- Group 1 -->
-          <div class="group">
-            <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
-
-            <div class="field main">
-              <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
-            </div>
-
-            <div class="field time">
-              <input class="timeInput" type="text" placeholder="Time">
-            </div>
-          </div>
-        </div>
-
-        <button class="addBtn" id="addBtn" type="button" aria-label="Add another pair">＋</button>
-      </div>
-
-    </div>
+  <div class="readout">
+    <div class="digital" id="digital">--:--:--</div>
+    <div class="status" id="syncStatus">Syncing…</div>
   </div>
+</div>
+</div>
+</div>
 
-  <script>
-    // ====== Build marks + numbers ======
-    const face = document.getElementById("face");
+</div>
+</div>
 
-    for (let i = 0; i < 60; i++){
-      const isHour = (i % 5 === 0);
-      const d = document.createElement("div");
-      d.className = "mark" + (isHour ? "" : " minor");
-      d.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg) translateY(-46%)`;
-      face.appendChild(d);
-    }
+<script>
+/* marks */
+const face=document.getElementById("face");
+for(let i=0;i<60;i++){
+  const d=document.createElement("div");
+  d.className="mark"+(i%5?" minor":"");
+  d.style.transform=`translate(-50%,-50%) rotate(${i*6}deg) translateY(-46%)`;
+  face.appendChild(d);
+}
 
-    // numbers 1..12 (trig positioning)
-    // Increase radius slightly to fit larger digits and keep them off the readout
-    const R = 43;
-    for (let n = 1; n <= 12; n++){
-      const angle = (n * 30 - 90) * Math.PI / 180;
-      const x = 50 + R * Math.cos(angle);
-      const y = 50 + R * Math.sin(angle);
-      const el = document.createElement("div");
-      el.className = "num";
-      el.textContent = String(n);
-      el.style.left = x + "%";
-      el.style.top  = y + "%";
-      face.appendChild(el);
-    }
+/* numbers */
+const R=43;
+for(let n=1;n<=12;n++){
+  const a=(n*30-90)*Math.PI/180;
+  const el=document.createElement("div");
+  el.className="num";
+  el.textContent=n;
+  el.style.left=50+R*Math.cos(a)+"%";
+  el.style.top =50+R*Math.sin(a)+"%";
+  face.appendChild(el);
+}
 
-    // ====== Online sync via Apps Script ======
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydFg6fSuA9KQn5ZY42PRn2t09tq2Kqbrsv3TlqDPIVyNpNEadheHSmr3t2bZGxONEh/exec";
-    const TZ = "Asia/Hong_Kong";
+/* clock */
+const hHand=document.getElementById("hHand");
+const mHand=document.getElementById("mHand");
+const sHand=document.getElementById("sHand");
+const digital=document.getElementById("digital");
 
-    const hHand = document.getElementById("hHand");
-    const mHand = document.getElementById("mHand");
-    const sHand = document.getElementById("sHand");
-    const digital = document.getElementById("digital");
-    const syncStatus = document.getElementById("syncStatus");
+function render(){
+  const d=new Date();
+  const h=d.getHours()%12;
+  const m=d.getMinutes();
+  const s=d.getSeconds();
 
-    let offsetMs = 0;
-    let onlineSynced = false;
+  digital.textContent=d.toLocaleTimeString("en-GB",{hour12:false});
 
-    const digitalFmt = new Intl.DateTimeFormat("en-GB", {
-      timeZone: TZ,
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
-      hour12: false
-    });
+  sHand.style.transform=`translate(-50%,-100%) rotate(${s*6}deg)`;
+  mHand.style.transform=`translate(-50%,-100%) rotate(${(m+s/60)*6}deg)`;
+  hHand.style.transform=`translate(-50%,-100%) rotate(${(h+m/60)*30}deg)`;
+}
+setInterval(render,1000);
+render();
+</script>
 
-    function hkParts(date){
-      const parts = new Intl.DateTimeFormat("en-GB", {
-        timeZone: TZ,
-        hour: "2-digit", minute: "2-digit", second: "2-digit",
-        hour12: false
-      }).formatToParts(date);
-
-      return {
-        hh: Number(parts.find(p => p.type === "hour").value),
-        mm: Number(parts.find(p => p.type === "minute").value),
-        ss: Number(parts.find(p => p.type === "second").value),
-      };
-    }
-
-    function render(epochMs){
-      const d = new Date(epochMs);
-      digital.textContent = digitalFmt.format(d);
-
-      const {hh, mm, ss} = hkParts(d);
-      const hour12 = hh % 12;
-
-      // seconds hand: tick (align with digits)
-      const secDeg = ss * 6;
-
-      // minute/hour hands: smooth-ish using seconds
-      const minDeg = (mm + ss/60) * 6;
-      const hourDeg = (hour12 + mm/60 + ss/3600) * 30;
-
-      sHand.style.transform = `translate(-50%, -100%) rotate(${secDeg}deg)`;
-      mHand.style.transform = `translate(-50%, -100%) rotate(${minDeg}deg)`;
-      hHand.style.transform = `translate(-50%, -100%) rotate(${hourDeg}deg)`;
-    }
-
-    function tick(){
-      render(Date.now() + offsetMs);
-    }
-
-    async function syncOnce(){
-      try{
-        syncStatus.textContent = "Syncing (online)…";
-        const t0 = performance.now();
-        const res = await fetch(SCRIPT_URL, { cache: "no-store" });
-        if(!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-        if(typeof data.epochMs !== "number") throw new Error("Missing epochMs");
-
-        const serverEpoch = data.epochMs;
-        const t1 = performance.now();
-        const rtt = (t1 - t0);
-        const approxLocalAtMid = Date.now() - (rtt / 2);
-
-        offsetMs = serverEpoch - approxLocalAtMid;
-        onlineSynced = true;
-        syncStatus.textContent = "Online synced ✓";
-      }catch(e){
-        syncStatus.textContent = onlineSynced ? "Sync failed (keeping last sync)" : "Offline fallback (device clock)";
-      }
-    }
-
-    (async () => {
-      await syncOnce();
-      tick();
-      setInterval(tick, 1000);
-      setInterval(syncOnce, 5 * 60 * 1000);
-    })();
-
-    // ====== Groups: max 3, delete, add, smart font sizing ======
-    const MAX_GROUPS = 3;
-
-    const sideEl = document.getElementById("side");
-    const groupsEl = document.getElementById("groups");
-    const addBtn = document.getElementById("addBtn");
-
-    const MAX_MAIN_FONT = 50;
-    const MAX_TIME_FONT = 30;
-    const TIME_RATIO = 0.60;
-    const MIN_MAIN_FONT = 20;
-    const MIN_TIME_FONT = 14;
-
-    function groupCount(){
-      return groupsEl.querySelectorAll(".group").length;
-    }
-
-    function refreshAddButtonState(){
-      addBtn.disabled = groupCount() >= MAX_GROUPS;
-    }
-
-    function clearGroupInputs(groupEl){
-      const ta = groupEl.querySelector(".mainInput");
-      const ti = groupEl.querySelector(".timeInput");
-      if (ta) ta.value = "";
-      if (ti) ti.value = "";
-      if (ta) ta.focus();
-    }
-
-    function attachDeleteHandler(groupEl){
-      const del = groupEl.querySelector(".delBtn");
-      if (!del) return;
-
-      del.addEventListener("click", () => {
-        const n = groupCount();
-        if (n <= 1){
-          clearGroupInputs(groupEl);
-          return;
-        }
-        groupEl.remove();
-        updateSmartLayout();
-      });
-    }
-
-    function createGroup(){
-      const group = document.createElement("div");
-      group.className = "group";
-      group.innerHTML = `
-        <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
-
-        <div class="field main">
-          <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
-        </div>
-
-        <div class="field time">
-          <input class="timeInput" type="text" placeholder="Time">
-        </div>
-      `;
-      attachDeleteHandler(group);
-      return group;
-    }
-
-    addBtn.addEventListener("click", () => {
-      if (groupCount() >= MAX_GROUPS) return;
-      const g = createGroup();
-      groupsEl.appendChild(g);
-      updateSmartLayout();
-      const ta = g.querySelector(".mainInput");
-      if (ta) ta.focus();
-    });
-
-    groupsEl.querySelectorAll(".group").forEach(attachDeleteHandler);
-
-    function pxToNum(px){
-      const n = Number(String(px).replace("px",""));
-      return Number.isFinite(n) ? n : 0;
-    }
-
-    function getInnerHeight(el){
-      const cs = getComputedStyle(el);
-      const pt = pxToNum(cs.paddingTop);
-      const pb = pxToNum(cs.paddingBottom);
-      return Math.max(0, el.clientHeight - pt - pb);
-    }
-
-    function computeMaxFontForOneLine(fieldEl, lineHeightMultiplier){
-      const innerH = getInnerHeight(fieldEl);
-      const safety = 6;
-      const usable = Math.max(0, innerH - safety);
-      return Math.floor(usable / lineHeightMultiplier);
-    }
-
-    function updateSmartLayout(){
-      refreshAddButtonState();
-
-      requestAnimationFrame(() => {
-        const groups = Array.from(groupsEl.querySelectorAll(".group"));
-        if (groups.length === 0) return;
-
-        const mainHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.main"), 1.05);
-        const timeHeightMax = computeMaxFontForOneLine(groups[0].querySelector(".field.time"), 1.05);
-
-        let main = Math.min(MAX_MAIN_FONT, mainHeightMax);
-        let time = Math.min(MAX_TIME_FONT, Math.floor(main * TIME_RATIO), timeHeightMax);
-
-        const impliedMainFromTime = Math.floor(time / TIME_RATIO);
-        main = Math.min(main, impliedMainFromTime);
-
-        main = Math.max(MIN_MAIN_FONT, main);
-        time = Math.max(MIN_TIME_FONT, time);
-
-        sideEl.style.setProperty("--mainFont", main + "px");
-        sideEl.style.setProperty("--timeFont", time + "px");
-      });
-    }
-
-    window.addEventListener("resize", updateSmartLayout);
-    updateSmartLayout();
-  </script>
 </body>
 </html>
