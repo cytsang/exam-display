@@ -1,296 +1,553 @@
 <!doctype html>
 <html lang="zh-HK">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SPSLT Exam Display</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SPSLT Exam Display</title>
 
-<style>
-:root{
-  --bg:#ffffff;
-  --text:#111827;
-  --muted:#6b7280;
-}
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+    }
 
-*{ box-sizing:border-box; }
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, "PingFang HK", "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "PingFang HK", "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-.wrap{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-}
+    .wrap{
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+    }
 
-.stage{
-  width:min(1100px,100%);
-  display:flex;
-  gap:28px;
-  align-items:center;
-}
+    .stage{
+      width: min(1100px, 100%);
+      display:flex;
+      gap: 28px;
+      align-items:center;
+    }
 
-/* ===== LEFT CLOCK ===== */
-.clockShell{ flex:1 1 60%; display:flex; justify-content:center; }
+    /* ===== LEFT CLOCK ===== */
+    .clockShell{ flex: 1 1 60%; display:flex; justify-content:center; align-items:center; }
 
-.clockCircle{
-  width:min(560px,68vw);
-  aspect-ratio:1/1;
-  border:10px solid #2563eb;
-  border-radius:50%;
-  background:#fff;
-  box-shadow:0 12px 30px rgba(37,99,235,.25);
-  padding:16px;
-}
+    .clockCircle{
+      width: min(560px, 68vw);
+      aspect-ratio: 1 / 1;
+      border: 10px solid #2563eb;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(37,99,235,.25);
+      padding: 16px;
+      position: relative;
+    }
 
-.face{
-  width:100%;
-  height:100%;
-  border-radius:50%;
-  position:relative;
-  background:
-    radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
-    radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
-    #fff7cc;
-}
+    .face{
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle at center, rgba(0,0,0,.06) 0 2px, transparent 3px),
+        radial-gradient(circle at center, rgba(0,0,0,.04) 0 55%, transparent 56%),
+        #fff7cc;
+      overflow: hidden;
+    }
 
-/* marks */
-.mark{
-  position:absolute;
-  left:50%; top:50%;
-  width:7px; height:22px;
-  background:rgba(17,24,39,.7);
-  border-radius:6px;
-  transform:translate(-50%,-50%) rotate(0deg) translateY(-46%);
-}
-.mark.minor{
-  width:3px; height:12px;
-  background:rgba(17,24,39,.25);
-}
+    /* marks */
+    .mark{
+      position:absolute;
+      left:50%; top:50%;
+      width:7px; height:22px;
+      background:rgba(17,24,39,.70);
+      border-radius:6px;
+      transform:translate(-50%,-50%) rotate(0deg) translateY(-46%);
+      z-index: 1;
+    }
+    .mark.minor{
+      width:3px; height:12px;
+      background:rgba(17,24,39,.25);
+    }
 
-/* numbers (2x size) */
-.num{
-  position:absolute;
-  transform:translate(-50%,-50%);
-  font-weight:900;
-  font-size:clamp(36px,4.5vw,52px);
-  color:rgba(17,24,39,.85);
-  user-select:none;
-}
+    /* clock numbers (2x) */
+    .num{
+      position:absolute;
+      transform: translate(-50%, -50%);
+      font-weight: 900;
+      font-size: clamp(36px, 4.5vw, 52px);
+      color: rgba(17,24,39,.85);
+      user-select:none;
+      pointer-events:none;
+      z-index: 2;
+    }
 
-/* hands */
-.hand{
-  position:absolute;
-  left:50%; top:50%;
-  transform-origin:50% 100%;
-  transform:translate(-50%,-100%) rotate(0deg);
-  border-radius:999px;
-}
-.hand.hour{ width:14px; height:30%; background:#111827; }
-.hand.minute{ width:10px; height:42%; background:#1f2937; }
-.hand.second{ width:3px; height:48%; background:#dc2626; }
+    /* hands */
+    .hand{
+      position:absolute;
+      left:50%; top:50%;
+      transform-origin: 50% 100%;
+      transform: translate(-50%, -100%) rotate(0deg);
+      border-radius: 999px;
+      z-index: 4;
+    }
+    .hand.hour{ width:14px; height:30%; background:#111827; }
+    .hand.minute{ width:10px; height:42%; background:#1f2937; }
+    .hand.second{ width:3px; height:48%; background:#dc2626; z-index: 6; }
 
-.hub{
-  position:absolute;
-  left:50%; top:50%;
-  width:18px; height:18px;
-  background:#111827;
-  border-radius:50%;
-  transform:translate(-50%,-50%);
-}
+    .hub{
+      position:absolute;
+      left:50%; top:50%;
+      width:18px; height:18px;
+      background:#111827;
+      border-radius:50%;
+      transform: translate(-50%, -50%);
+      z-index: 7;
+    }
 
-/* ===== DIGITAL READOUT ===== */
-.readout{
-  position:absolute;
-  left:50%;
-  bottom:18%;                 /* 上移至中心稍下 */
-  transform:translateX(-50%);
-  text-align:center;
-  background:rgba(255,255,255,.9);
-  border-radius:14px;
-  padding:10px 16px;
-  min-width:260px;
-}
+    /* digital readout */
+    .readout{
+      position:absolute;
+      left:50%;
+      bottom: 18%;                 /* moved up: slightly below center */
+      transform: translateX(-50%);
+      text-align:center;
+      background: rgba(255,255,255,.90);
+      border-radius: 14px;
+      padding: 10px 16px;
+      min-width: 260px;            /* box size unchanged */
+      z-index: 8;
+    }
+    .digital{
+      font-weight: 900;
+      font-size: 44px;             /* larger digits to fill box */
+      line-height: 1.05;
+      letter-spacing: .5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .status{
+      font-size: 10px;             /* smaller online synced */
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.05;
+    }
 
-.digital{
-  font-weight:900;
-  font-size:44px;             /* 放大 */
-  line-height:1.05;
-}
+    /* ===== RIGHT TEXTBOXES ===== */
+    .side{
+      flex: 0 0 min(520px, 100%);
+      display:flex;
+      flex-direction:column;
+      height: min(520px, 70vh);
+      position: relative;
 
-.status{
-  font-size:10px;             /* 縮細 */
-  color:var(--muted);
-  margin-top:2px;
-}
+      /* dynamic font sizes controlled by JS */
+      --mainFont: 50px;
+      --timeFont: 30px;
+    }
 
-/* ===== RIGHT TEXTBOX AREA ===== */
-.side{
-  flex:0 0 min(520px,100%);
-  display:flex;
-  flex-direction:column;
-  height:min(520px,70vh);
-  --mainFont:50px;
-  --timeFont:30px;
-}
+    .groups{
+      flex: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+      min-height: 0;
+      padding-right: 68px; /* space so + doesn't overlap */
+    }
 
-.groups{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
+    .group{
+      flex: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+      min-height: 0;
+      position: relative;
+    }
 
-.group{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  position:relative;
-}
+    /* no visible borders */
+    .field{
+      border: none;
+      background: transparent;
+      padding: 0;
+      min-height: 0;
+    }
 
-/* no border textbox */
-.field{
-  border:none;
-  background:transparent;
-}
+    .field.main{ flex: 5; }
+    .field.time{ flex: 4; }
 
-.field.main textarea{
-  width:100%;
-  height:100%;
-  border:none;
-  outline:none;
-  background:transparent;
-  font-size:var(--mainFont);
-  font-weight:850;          /* main bold */
-  text-align:center;
-  resize:none;
-}
+    .field.main textarea{
+      width:100%;
+      height:100%;
+      border:none;
+      outline:none;
+      background: transparent;
+      font-size: var(--mainFont);
+      font-weight: 850;      /* main bold */
+      letter-spacing: .3px;
+      line-height: 1.05;
+      text-align:center;
+      resize: none;
+      padding: 0;
+      overflow: hidden;
+      display:block;
+      color: var(--text);
+      caret-color: #111;
+    }
 
-.field.time input{
-  width:100%;
-  border:none;
-  outline:none;
-  background:transparent;
-  font-size:var(--timeFont);
-  font-weight:400;          /* time not bold */
-  text-align:center;
-}
+    .field.time input{
+      width:100%;
+      height:100%;
+      border:none;
+      outline:none;
+      background: transparent;
+      font-size: var(--timeFont);
+      font-weight: 400;      /* time not bold */
+      letter-spacing: .3px;
+      line-height: 1.05;
+      text-align:center;
+      padding: 0;
+      color: var(--text);
+    }
 
-.addBtn{
-  align-self:flex-end;
-  font-size:36px;
-  background:#fff;
-  border:none;
-  cursor:pointer;
-}
+    .field.main textarea::placeholder{
+      color: rgba(17,17,17,.35);
+      font-weight: 700;
+      text-align:center;
+    }
+    .field.time input::placeholder{
+      color: rgba(17,17,17,.35);
+      font-weight: 400;
+      text-align:center;
+    }
 
-.delBtn{
-  position:absolute;
-  right:0;
-  top:0;
-  background:#fff;
-  border:none;
-  font-size:22px;
-  cursor:pointer;
-}
+    /* + and × */
+    .addBtn{
+      position:absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 60px;
+      height: 60px;
+      border-radius: 999px;
+      border: 2px solid rgba(0,0,0,.15);
+      background: #fff;
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1;
+      cursor:pointer;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .addBtn[disabled]{ opacity:.4; cursor:not-allowed; }
 
-/* ===== responsive ===== */
-@media(max-width:900px){
-  .stage{ flex-direction:column; }
-  .side{ width:100%; }
-}
-</style>
+    .delBtn{
+      position:absolute;
+      right: 0;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 2px solid rgba(0,0,0,.15);
+      background:#fff;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      cursor:pointer;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    @media (max-width: 900px){
+      .stage{ flex-direction:column; }
+      .side{ width: 100%; height: min(520px, 55vh); }
+      .groups{ padding-right: 0; }
+      .addBtn{ right: 12px; bottom: 12px; }
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<div class="stage">
+  <div class="wrap">
+    <div class="stage">
 
-<!-- CLOCK -->
-<div class="clockShell">
-<div class="clockCircle">
-<div class="face" id="face">
-  <div class="hand hour" id="hHand"></div>
-  <div class="hand minute" id="mHand"></div>
-  <div class="hand second" id="sHand"></div>
-  <div class="hub"></div>
+      <!-- LEFT clock -->
+      <div class="clockShell">
+        <div class="clockCircle">
+          <div class="face" id="face">
+            <div class="hand hour" id="hHand"></div>
+            <div class="hand minute" id="mHand"></div>
+            <div class="hand second" id="sHand"></div>
+            <div class="hub"></div>
 
-  <div class="readout">
-    <div class="digital" id="digital">--:--:--</div>
-    <div class="status" id="syncStatus">Online synced</div>
-  </div>
-</div>
-</div>
-</div>
-
-<!-- RIGHT TEXTBOXES -->
-<div class="side">
-  <div class="groups" id="groups">
-    <div class="group">
-      <button class="delBtn">×</button>
-      <div class="field main">
-        <textarea rows="2" placeholder="Level / Subj / Paper"></textarea>
+            <div class="readout">
+              <div class="digital" id="digital">--:--:--</div>
+              <div class="status" id="syncStatus">Syncing…</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="field time">
-        <input type="text" placeholder="Time">
+
+      <!-- RIGHT textboxes -->
+      <div class="side" id="side">
+        <div class="groups" id="groups">
+          <div class="group">
+            <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
+
+            <div class="field main">
+              <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+            </div>
+
+            <div class="field time">
+              <input class="timeInput" type="text" placeholder="Time">
+            </div>
+          </div>
+        </div>
+
+        <button class="addBtn" id="addBtn" type="button" aria-label="Add another pair">＋</button>
       </div>
+
     </div>
   </div>
-  <button class="addBtn" id="addBtn">＋</button>
-</div>
 
-</div>
-</div>
+  <script>
+    // ====== Build marks + numbers ======
+    const face = document.getElementById("face");
 
-<script>
-/* marks */
-const face=document.getElementById("face");
-for(let i=0;i<60;i++){
-  const d=document.createElement("div");
-  d.className="mark"+(i%5?" minor":"");
-  d.style.transform=`translate(-50%,-50%) rotate(${i*6}deg) translateY(-46%)`;
-  face.appendChild(d);
-}
+    for (let i = 0; i < 60; i++){
+      const isHour = (i % 5 === 0);
+      const d = document.createElement("div");
+      d.className = "mark" + (isHour ? "" : " minor");
+      d.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg) translateY(-46%)`;
+      face.appendChild(d);
+    }
 
-/* numbers */
-const R=43;
-for(let n=1;n<=12;n++){
-  const a=(n*30-90)*Math.PI/180;
-  const el=document.createElement("div");
-  el.className="num";
-  el.textContent=n;
-  el.style.left=50+R*Math.cos(a)+"%";
-  el.style.top =50+R*Math.sin(a)+"%";
-  face.appendChild(el);
-}
+    // numbers 1..12 (slightly tuned radius for big digits)
+    const R = 43;
+    for (let n = 1; n <= 12; n++){
+      const a = (n * 30 - 90) * Math.PI / 180;
+      const el = document.createElement("div");
+      el.className = "num";
+      el.textContent = String(n);
+      el.style.left = (50 + R * Math.cos(a)) + "%";
+      el.style.top  = (50 + R * Math.sin(a)) + "%";
+      face.appendChild(el);
+    }
 
-/* clock */
-const hHand=document.getElementById("hHand");
-const mHand=document.getElementById("mHand");
-const sHand=document.getElementById("sHand");
-const digital=document.getElementById("digital");
+    // ====== Online sync via Apps Script ======
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydFg6fSuA9KQn5ZY42PRn2t09tq2Kqbrsv3TlqDPIVyNpNEadheHSmr3t2bZGxONEh/exec";
+    const TZ = "Asia/Hong_Kong";
 
-function render(){
-  const d=new Date();
-  const h=d.getHours()%12;
-  const m=d.getMinutes();
-  const s=d.getSeconds();
+    const hHand = document.getElementById("hHand");
+    const mHand = document.getElementById("mHand");
+    const sHand = document.getElementById("sHand");
+    const digital = document.getElementById("digital");
+    const syncStatus = document.getElementById("syncStatus");
 
-  digital.textContent=d.toLocaleTimeString("en-GB",{hour12:false});
+    let offsetMs = 0;
+    let onlineSynced = false;
 
-  sHand.style.transform=`translate(-50%,-100%) rotate(${s*6}deg)`;
-  mHand.style.transform=`translate(-50%,-100%) rotate(${(m+s/60)*6}deg)`;
-  hHand.style.transform=`translate(-50%,-100%) rotate(${(h+m/60)*30}deg)`;
-}
-setInterval(render,1000);
-render();
-</script>
+    const digitalFmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: TZ,
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour12: false
+    });
 
+    function hkParts(date){
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: TZ,
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: false
+      }).formatToParts(date);
+
+      return {
+        hh: Number(parts.find(p => p.type === "hour").value),
+        mm: Number(parts.find(p => p.type === "minute").value),
+        ss: Number(parts.find(p => p.type === "second").value),
+      };
+    }
+
+    function render(epochMs){
+      const d = new Date(epochMs);
+      digital.textContent = digitalFmt.format(d);
+
+      const {hh, mm, ss} = hkParts(d);
+      const hour12 = hh % 12;
+
+      // seconds hand: tick, aligned with displayed seconds
+      const secDeg = ss * 6;
+      const minDeg = (mm + ss/60) * 6;
+      const hourDeg = (hour12 + mm/60 + ss/3600) * 30;
+
+      sHand.style.transform = `translate(-50%, -100%) rotate(${secDeg}deg)`;
+      mHand.style.transform = `translate(-50%, -100%) rotate(${minDeg}deg)`;
+      hHand.style.transform = `translate(-50%, -100%) rotate(${hourDeg}deg)`;
+    }
+
+    function tick(){
+      render(Date.now() + offsetMs);
+    }
+
+    async function syncOnce(){
+      try{
+        syncStatus.textContent = "Syncing (online)…";
+        const t0 = performance.now();
+        const res = await fetch(SCRIPT_URL, { cache: "no-store" });
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        if(typeof data.epochMs !== "number") throw new Error("Missing epochMs");
+
+        const serverEpoch = data.epochMs;
+        const t1 = performance.now();
+        const rtt = (t1 - t0);
+        const approxLocalAtMid = Date.now() - (rtt / 2);
+
+        offsetMs = serverEpoch - approxLocalAtMid;
+        onlineSynced = true;
+        syncStatus.textContent = "Online synced ✓";
+      }catch(e){
+        syncStatus.textContent = onlineSynced ? "Sync failed (keeping last sync)" : "Offline fallback (device clock)";
+      }
+    }
+
+    (async () => {
+      await syncOnce();
+      tick();
+      setInterval(tick, 1000);
+      setInterval(syncOnce, 5 * 60 * 1000);
+    })();
+
+    // ====== Groups: max 3, add/delete, smart font sizing ======
+    const MAX_GROUPS = 3;
+
+    const sideEl = document.getElementById("side");
+    const groupsEl = document.getElementById("groups");
+    const addBtn = document.getElementById("addBtn");
+
+    const MAX_MAIN_FONT = 50;   // 1 group target
+    const MAX_TIME_FONT = 30;   // 1 group target
+    const TIME_RATIO = 0.60;    // 30/50
+    const MIN_MAIN_FONT = 20;
+    const MIN_TIME_FONT = 14;
+
+    function groupCount(){
+      return groupsEl.querySelectorAll(".group").length;
+    }
+
+    function refreshAddButtonState(){
+      addBtn.disabled = (groupCount() >= MAX_GROUPS);
+    }
+
+    function clearGroupInputs(groupEl){
+      const ta = groupEl.querySelector(".mainInput");
+      const ti = groupEl.querySelector(".timeInput");
+      if (ta) ta.value = "";
+      if (ti) ti.value = "";
+      if (ta) ta.focus();
+    }
+
+    function attachDeleteHandler(groupEl){
+      const del = groupEl.querySelector(".delBtn");
+      if (!del) return;
+
+      del.addEventListener("click", () => {
+        const n = groupCount();
+        if (n <= 1){
+          clearGroupInputs(groupEl);
+          return;
+        }
+        groupEl.remove();
+        updateSmartLayout();
+      });
+    }
+
+    function createGroup(){
+      const group = document.createElement("div");
+      group.className = "group";
+      group.innerHTML = `
+        <button class="delBtn" type="button" aria-label="Delete this pair">×</button>
+        <div class="field main">
+          <textarea class="mainInput" rows="2" placeholder="Level / Subj / Paper"></textarea>
+        </div>
+        <div class="field time">
+          <input class="timeInput" type="text" placeholder="Time">
+        </div>
+      `;
+      attachDeleteHandler(group);
+      return group;
+    }
+
+    addBtn.addEventListener("click", () => {
+      if (groupCount() >= MAX_GROUPS) return;
+      const g = createGroup();
+      groupsEl.appendChild(g);
+      updateSmartLayout();
+      const ta = g.querySelector(".mainInput");
+      if (ta) ta.focus();
+    });
+
+    // init delete handlers for existing groups
+    groupsEl.querySelectorAll(".group").forEach(attachDeleteHandler);
+
+    function pxToNum(px){
+      const n = Number(String(px).replace("px",""));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function getInnerHeight(el){
+      const cs = getComputedStyle(el);
+      const pt = pxToNum(cs.paddingTop);
+      const pb = pxToNum(cs.paddingBottom);
+      return Math.max(0, el.clientHeight - pt - pb);
+    }
+
+    function computeMaxFontForOneLine(fieldEl, lineHeightMultiplier){
+      const innerH = getInnerHeight(fieldEl);
+      const safety = 6;
+      const usable = Math.max(0, innerH - safety);
+      return Math.floor(usable / lineHeightMultiplier);
+    }
+
+    function updateSmartLayout(){
+      refreshAddButtonState();
+
+      requestAnimationFrame(() => {
+        const groups = Array.from(groupsEl.querySelectorAll(".group"));
+        if (groups.length === 0) return;
+
+        const mainField = groups[0].querySelector(".field.main");
+        const timeField = groups[0].querySelector(".field.time");
+        if (!mainField || !timeField) return;
+
+        const mainHeightMax = computeMaxFontForOneLine(mainField, 1.05);
+        const timeHeightMax = computeMaxFontForOneLine(timeField, 1.05);
+
+        let main = Math.min(MAX_MAIN_FONT, mainHeightMax);
+        let time = Math.min(MAX_TIME_FONT, Math.floor(main * TIME_RATIO), timeHeightMax);
+
+        const impliedMainFromTime = Math.floor(time / TIME_RATIO);
+        main = Math.min(main, impliedMainFromTime);
+
+        main = Math.max(MIN_MAIN_FONT, main);
+        time = Math.max(MIN_TIME_FONT, time);
+
+        sideEl.style.setProperty("--mainFont", main + "px");
+        sideEl.style.setProperty("--timeFont", time + "px");
+      });
+    }
+
+    window.addEventListener("resize", updateSmartLayout);
+
+    // initial
+    updateSmartLayout();
+    refreshAddButtonState();
+  </script>
 </body>
 </html>
