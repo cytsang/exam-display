@@ -10,8 +10,6 @@
       --bg:#ffffff;
       --text:#111827;
       --muted:#9aa3af;
-      --radius:10px;
-      --borderColor:#111;
     }
 
     *{ box-sizing:border-box; }
@@ -87,13 +85,14 @@
       background: rgba(17,24,39,.22);
     }
 
+    /* numbers 1-12 (amended: ~2x bigger) */
     .num{
       position:absolute;
       transform: translate(-50%, -50%);
       font-variant-numeric: tabular-nums;
-      font-weight: 850;
-      font-size: clamp(18px, 2.2vw, 26px);
-      color: rgba(17,24,39,.78);
+      font-weight: 900;
+      font-size: clamp(36px, 4.4vw, 52px); /* doubled */
+      color: rgba(17,24,39,.82);
       user-select: none;
       pointer-events: none;
       text-shadow: 0 1px 0 rgba(255,255,255,.6);
@@ -148,10 +147,11 @@
       background: rgba(255,255,255,.18);
     }
 
+    /* Digital clock readout (amended) */
     .readout{
       position:absolute;
       left:50%;
-      bottom: 7%;
+      bottom: 11%;              /* moved up */
       transform: translateX(-50%);
       text-align:center;
       padding: 10px 14px;
@@ -159,18 +159,24 @@
       border-radius: 14px;
       background: rgba(255,255,255,.85);
       backdrop-filter: blur(6px);
-      min-width: 240px;
+      min-width: 240px;         /* keep size */
       z-index: 8;
     }
+
+    /* make the digits fill the box more */
     .digital{
       font-variant-numeric: tabular-nums;
       font-weight: 900;
-      font-size: 24px;
+      font-size: 38px;          /* larger to occupy the box */
+      line-height: 1.05;
       letter-spacing: .5px;
     }
+
+    /* make "online synced" smaller */
     .status{
       margin-top: 4px;
-      font-size: 12px;
+      font-size: 11px;          /* slightly smaller */
+      line-height: 1.05;
       color: #374151;
     }
 
@@ -183,7 +189,6 @@
       height: min(520px, 70vh);
       position: relative;
 
-      /* dynamic font sizes controlled by JS */
       --mainFont: 50px;
       --timeFont: 30px;
     }
@@ -194,7 +199,7 @@
       flex-direction:column;
       gap: 18px;
       min-height: 0;
-      padding-right: 70px; /* space for + button */
+      padding-right: 70px;
     }
 
     .group{
@@ -206,24 +211,22 @@
       position: relative;
     }
 
-    /* Simple big-word textbox style */
+    /* Textboxes with NO obvious border (as requested earlier) */
     .field{
-      background: #fff;
-      border: 2px solid var(--borderColor);
-      border-radius: var(--radius);
+      background: transparent;
+      border: none;
+      border-radius: 10px;
       box-shadow: none;
-      padding: 6px 14px;
+      padding: 0;
       display:flex;
       overflow:hidden;
       min-height: 0;
       position: relative;
     }
 
-    /* height ratio 5:4 inside each group */
     .field.main { flex: 5; }
     .field.time { flex: 4; }
 
-    /* MAIN textarea: normal top-aligned display (no vertical centering overlay) */
     .field.main textarea{
       width:100%;
       height:100%;
@@ -233,7 +236,7 @@
       color: var(--text);
       caret-color: #111;
       font-size: var(--mainFont);
-      font-weight: 850;      /* main = bold */
+      font-weight: 850;      /* main bold */
       letter-spacing: .3px;
       line-height: 1.05;
       resize:none;
@@ -243,7 +246,6 @@
       display:block;
     }
 
-    /* TIME input: NOT bold */
     .field.time input{
       width:100%;
       height:100%;
@@ -252,13 +254,12 @@
       background:transparent;
       color: var(--text);
       font-size: var(--timeFont);
-      font-weight: 400;      /* time = not bold */
+      font-weight: 400;      /* time not bold */
       letter-spacing: .3px;
       padding: 0;
       text-align:center;
     }
 
-    /* placeholders */
     .field textarea::placeholder{
       text-align: center;
       color: rgba(17,17,17,.35);
@@ -267,10 +268,9 @@
     .field.time input::placeholder{
       text-align: center;
       color: rgba(17,17,17,.35);
-      font-weight: 400; /* time placeholder not bold */
+      font-weight: 400;
     }
 
-    /* plus button */
     .addBtn{
       position:absolute;
       right: 8px;
@@ -278,7 +278,7 @@
       width: 60px;
       height: 60px;
       border-radius: 999px;
-      border: 2px solid var(--borderColor);
+      border: 2px solid rgba(0,0,0,.15);
       background: #fff;
       box-shadow: none;
       font-size: 40px;
@@ -293,7 +293,6 @@
     .addBtn:active{ transform: translateY(1px); }
     .addBtn[disabled]{ opacity:.45; cursor:not-allowed; }
 
-    /* delete button per group */
     .delBtn{
       position: absolute;
       right: 10px;
@@ -301,7 +300,7 @@
       width: 36px;
       height: 36px;
       border-radius: 999px;
-      border: 2px solid var(--borderColor);
+      border: 2px solid rgba(0,0,0,.15);
       background: #fff;
       box-shadow: none;
       font-size: 22px;
@@ -323,14 +322,6 @@
       .groups{ padding-right: 0; }
       .addBtn{ right: 12px; bottom: 12px; }
     }
-
-        /* === Ultra subtle textbox boundary === */
-    .field{
-      border: 1px solid rgba(0,0,0,.08) !important;
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-
   </style>
 </head>
 
@@ -390,7 +381,9 @@
       face.appendChild(d);
     }
 
-    const R = 44;
+    // numbers 1..12 (trig positioning)
+    // Increase radius slightly to fit larger digits and keep them off the readout
+    const R = 43;
     for (let n = 1; n <= 12; n++){
       const angle = (n * 30 - 90) * Math.PI / 180;
       const x = 50 + R * Math.cos(angle);
@@ -442,13 +435,13 @@
 
       const {hh, mm, ss} = hkParts(d);
       const hour12 = hh % 12;
-      // 秒針：用整秒，與數碼顯示一致，對齊 1-12
+
+      // seconds hand: tick (align with digits)
       const secDeg = ss * 6;
 
-      // 分針/時針：可以保留「順滑」，用 ss 做細微推進
+      // minute/hour hands: smooth-ish using seconds
       const minDeg = (mm + ss/60) * 6;
       const hourDeg = (hour12 + mm/60 + ss/3600) * 30;
-
 
       sHand.style.transform = `translate(-50%, -100%) rotate(${secDeg}deg)`;
       mHand.style.transform = `translate(-50%, -100%) rotate(${minDeg}deg)`;
@@ -495,14 +488,9 @@
     const groupsEl = document.getElementById("groups");
     const addBtn = document.getElementById("addBtn");
 
-    // Desired max when only 1 group
     const MAX_MAIN_FONT = 50;
     const MAX_TIME_FONT = 30;
-
-    // ratio based on 30/50
     const TIME_RATIO = 0.60;
-
-    // Lower bounds
     const MIN_MAIN_FONT = 20;
     const MIN_TIME_FONT = 14;
 
@@ -564,7 +552,6 @@
       if (ta) ta.focus();
     });
 
-    // Attach delete handler for initial group
     groupsEl.querySelectorAll(".group").forEach(attachDeleteHandler);
 
     function pxToNum(px){
@@ -611,8 +598,6 @@
     }
 
     window.addEventListener("resize", updateSmartLayout);
-
-    // Initial
     updateSmartLayout();
   </script>
 </body>
