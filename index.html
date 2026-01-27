@@ -35,7 +35,7 @@ body{
   align-items:center;
 }
 
-/* ===== CLOCK ===== */
+/* ===== LEFT CLOCK ===== */
 .clockShell{ flex:1 1 60%; display:flex; justify-content:center; }
 
 .clockCircle{
@@ -104,11 +104,11 @@ body{
   transform:translate(-50%,-50%);
 }
 
-/* ===== DIGITAL READOUT (AMENDED) ===== */
+/* ===== DIGITAL READOUT ===== */
 .readout{
   position:absolute;
   left:50%;
-  bottom:18%;                 /* 🔼 再上移：接近中心點下方 */
+  bottom:18%;                 /* 上移至中心稍下 */
   transform:translateX(-50%);
   text-align:center;
   background:rgba(255,255,255,.9);
@@ -119,18 +119,17 @@ body{
 
 .digital{
   font-weight:900;
-  font-size:44px;             /* 🔍 再加大 */
+  font-size:44px;             /* 放大 */
   line-height:1.05;
-  letter-spacing:.5px;
 }
 
 .status{
-  font-size:10px;             /* 🔽 再縮細 */
+  font-size:10px;             /* 縮細 */
   color:var(--muted);
   margin-top:2px;
 }
 
-/* ===== RIGHT SIDE ===== */
+/* ===== RIGHT TEXTBOX AREA ===== */
 .side{
   flex:0 0 min(520px,100%);
   display:flex;
@@ -140,37 +139,72 @@ body{
   --timeFont:30px;
 }
 
-.groups{ flex:1; display:flex; flex-direction:column; gap:18px; }
+.groups{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
 
-.group{ flex:1; display:flex; flex-direction:column; gap:14px; }
+.group{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  position:relative;
+}
 
-.field{ border:none; background:transparent; }
+/* no border textbox */
+.field{
+  border:none;
+  background:transparent;
+}
 
 .field.main textarea{
-  width:100%; height:100%;
-  border:none; outline:none;
-  font-size:var(--mainFont);
-  font-weight:850;
-  text-align:center;
+  width:100%;
+  height:100%;
+  border:none;
+  outline:none;
   background:transparent;
+  font-size:var(--mainFont);
+  font-weight:850;          /* main bold */
+  text-align:center;
+  resize:none;
 }
 
 .field.time input{
   width:100%;
-  border:none; outline:none;
-  font-size:var(--timeFont);
-  font-weight:400;
-  text-align:center;
+  border:none;
+  outline:none;
   background:transparent;
+  font-size:var(--timeFont);
+  font-weight:400;          /* time not bold */
+  text-align:center;
 }
 
-.addBtn, .delBtn{
-  border:none;
+.addBtn{
+  align-self:flex-end;
+  font-size:36px;
   background:#fff;
-  font-size:32px;
+  border:none;
   cursor:pointer;
 }
 
+.delBtn{
+  position:absolute;
+  right:0;
+  top:0;
+  background:#fff;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* ===== responsive ===== */
+@media(max-width:900px){
+  .stage{ flex-direction:column; }
+  .side{ width:100%; }
+}
 </style>
 </head>
 
@@ -178,6 +212,7 @@ body{
 <div class="wrap">
 <div class="stage">
 
+<!-- CLOCK -->
 <div class="clockShell">
 <div class="clockCircle">
 <div class="face" id="face">
@@ -188,10 +223,26 @@ body{
 
   <div class="readout">
     <div class="digital" id="digital">--:--:--</div>
-    <div class="status" id="syncStatus">Syncing…</div>
+    <div class="status" id="syncStatus">Online synced</div>
   </div>
 </div>
 </div>
+</div>
+
+<!-- RIGHT TEXTBOXES -->
+<div class="side">
+  <div class="groups" id="groups">
+    <div class="group">
+      <button class="delBtn">×</button>
+      <div class="field main">
+        <textarea rows="2" placeholder="Level / Subj / Paper"></textarea>
+      </div>
+      <div class="field time">
+        <input type="text" placeholder="Time">
+      </div>
+    </div>
+  </div>
+  <button class="addBtn" id="addBtn">＋</button>
 </div>
 
 </div>
