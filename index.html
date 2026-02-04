@@ -12,8 +12,8 @@
       --muted:#6b7280;
 
       /* right side dynamic font vars (JS updates these) */
-      --mainFont: 55px;  /* subject title */
-      --timeFont: 45px;  /* time line */
+      --mainFont: 65px;  /* subject title */
+      --timeFont: 40px;  /* time line */
     }
 
     *{ box-sizing:border-box; }
@@ -446,8 +446,8 @@
     const addBtn = document.getElementById("addBtn");
 
     // base targets (1 group)
-    const TARGET_MAIN = 90; // allow bigger than before, we will clamp by height
-    const TARGET_TIME = 60;
+    const TARGET_MAIN = 65; // allow bigger than before, we will clamp by height
+    const TARGET_TIME = 50;
 
     // keep subject > time
     const TIME_RATIO = 0.62;     // time ≈ 62% of subject
